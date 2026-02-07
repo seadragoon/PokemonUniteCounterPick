@@ -9,7 +9,7 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
-  closestCenter,
+  pointerWithin,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import type { Set, Pokemon } from './types';
@@ -52,7 +52,9 @@ const buttonGroup = css`
   flex-wrap: wrap;
 `;
 
-const button = css`
+
+
+const addButton = css`
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
@@ -70,25 +72,43 @@ const button = css`
   &:active {
     transform: translateY(0);
   }
-`;
 
-const addButton = css`
-  ${button}
   background: #4caf50;
   color: white;
 
   &:hover {
     background: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   }
 `;
 
 const resetButton = css`
-  ${button}
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
   background: #f44336;
   color: white;
 
   &:hover {
     background: #da190b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   }
 `;
 
@@ -186,6 +206,51 @@ function App() {
     setActiveId(event.active.id as string);
   };
 
+  // ID解析ヘルパー
+  const parseDragId = (id: string) => {
+    if (id.startsWith('drop:')) {
+      // drop:{setId}:{itemId}
+      const parts = id.split(':');
+      return { type: 'item-zone', setId: parts[1], itemId: parts[2] } as const;
+    }
+    if (id.startsWith('pool-drop-')) {
+      // pool-drop-{setId}
+      const setId = id.replace('pool-drop-', '');
+      return { type: 'pool-zone', setId } as const;
+    }
+    if (id.startsWith('pool-')) {
+      // pool-{setId}-{pokemonId}
+      // "pool-" を除いた残りを "-" で分割
+      // setIdにハイフンが含まれる場合（set_timestampなど）を考慮し、最初の要素だけを取り出すのではなく、
+      // id構造が fixed prefix なので、pokemonIdが最後であると仮定するか、setIdの構造に依存する。
+      // 現在の実装では setId = `set_${ts}` (アンダースコア) なのでハイフンは安全だが、
+      // 将来的にsetIdにハイフンが入ると壊れる。
+      // ただし `pool-drop-` と区別が必要。
+      // ここでは `pool-` プレフィックスの後、最初のハイフン区切り...ではなく、
+      // `pool-{setId}-{pokemonId}`.
+      // 既存コードでは `id` は `set_...` なのでハイフンは無い。
+      // もし `uuid` だとハイフンが入る。
+      // 安全策: pokemonIdは末尾。
+      // しかし pokemonId も文字列。
+      // ここでは簡易的に split('-') で3分割 (pool, setId, pokemonId) とする。
+      // setIdにハイフンを含めない運用前提とする。
+      const parts = id.split('-');
+      if (parts.length >= 3) {
+        // pool-set_123-pikachu
+        return { type: 'pool-poke', setId: parts[1], pokemonId: parts.slice(2).join('-') } as const;
+      }
+      return null;
+    }
+    if (id.includes('-')) {
+      // {setId}-{itemId}-{pokemonId}
+      const parts = id.split('-');
+      if (parts.length >= 3) {
+        return { type: 'item-poke', setId: parts[0], itemId: parts[1], pokemonId: parts.slice(2).join('-') } as const;
+      }
+    }
+    return null;
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
@@ -194,36 +259,28 @@ function App() {
       return;
     }
 
-    const activeId = active.id as string;
-    const overId = over.id as string;
+    const activeData = parseDragId(active.id as string);
+    const overData = parseDragId(over.id as string);
 
-    // ドロップゾーン overId のパース (形式: "drop:setId:itemId")
-    const overParts = overId.startsWith('drop:') ? overId.split(':') : null;
-    const overSetIdFromDrop = overParts ? overParts[1] : null;
-    const overItemIdFromDrop = overParts ? overParts[2] : null;
+    if (!activeData || !overData) return;
 
-    // 項目/ポケモンIDのパース (形式: "setId-itemId-pokemonId" または "pool-pokemonId")
-    const activeParts = activeId.split('-');
-    const overPartsNormal = overId.includes('-') && !overId.startsWith('drop:') ? overId.split('-') : null;
-    const activeSetId = activeId.startsWith('pool-') ? '' : activeParts[0];
-    const activeItemId = activeId.startsWith('pool-') ? '' : activeParts[1];
-    const activePokemonId = activeId.startsWith('pool-') ? activeId.replace('pool-', '') : (activeParts[2] ?? '');
-    const overSetId = overSetIdFromDrop ?? (overPartsNormal ? overPartsNormal[0] : '');
-    const overItemId = overItemIdFromDrop ?? (overPartsNormal ? overPartsNormal[1] : '');
-    const overPokemonId = overPartsNormal && overPartsNormal[2] ? overPartsNormal[2] : '';
-
-    // セット内の並び替え（同一項目内のポケモン並び替え）
-    if (activeSetId === overSetId && activeItemId === overItemId && overPokemonId) {
-      const setIndex = sets.findIndex((s) => s.id === activeSetId);
+    // A. セット内並び替え (Item -> Same Item)
+    if (
+      activeData.type === 'item-poke' &&
+      overData.type === 'item-poke' &&
+      activeData.setId === overData.setId &&
+      activeData.itemId === overData.itemId
+    ) {
+      const setIndex = sets.findIndex((s) => s.id === activeData.setId);
       if (setIndex === -1) return;
 
       const set = sets[setIndex];
-      const itemIndex = set.items.findIndex((i) => i.id === activeItemId);
+      const itemIndex = set.items.findIndex((i) => i.id === activeData.itemId);
       if (itemIndex === -1) return;
 
       const item = set.items[itemIndex];
-      const oldIndex = item.pokemons.findIndex((p) => p.id === activePokemonId);
-      const newIndex = item.pokemons.findIndex((p) => p.id === overPokemonId);
+      const oldIndex = item.pokemons.findIndex((p) => p.id === activeData.pokemonId);
+      const newIndex = item.pokemons.findIndex((p) => p.id === overData.pokemonId);
 
       if (oldIndex !== -1 && newIndex !== -1) {
         const newSets = [...sets];
@@ -237,95 +294,124 @@ function App() {
       return;
     }
 
-    // プールから項目への移動（同じセット内のみ）
-    if (activeId.startsWith('pool-') && overId.startsWith('drop:')) {
-      const pokemonId = activeId.replace('pool-', '');
-      const setId = overSetIdFromDrop ?? '';
-      const itemId = overItemIdFromDrop ?? '';
+    // B. プール -> 項目 (Add)
+    if (
+      activeData.type === 'pool-poke' &&
+      (overData.type === 'item-zone' || overData.type === 'item-poke')
+    ) {
+      // 同一セットか確認
+      if (activeData.setId !== overData.setId) return;
 
-      // プールがどのセットに属するか確認
-      const setIndex = sets.findIndex((s) => 
-        s.pool.some((p) => p.id === pokemonId) && s.id === setId
-      );
-      if (setIndex === -1) return; // セット間の移動は禁止
+      const setId = activeData.setId;
+      const pokemonId = activeData.pokemonId;
+      const targetItemId = overData.itemId;
+
+      const setIndex = sets.findIndex((s) => s.id === setId);
+      if (setIndex === -1) return;
 
       const pokemon = samplePokemons.find((p) => p.id === pokemonId);
       if (!pokemon) return;
 
       const newSets = [...sets];
-      const itemIndex = newSets[setIndex].items.findIndex((i) => i.id === itemId);
+      const itemIndex = newSets[setIndex].items.findIndex((i) => i.id === targetItemId);
       if (itemIndex === -1) return;
 
-      // 既に存在する場合は削除
+      // 既に存在する場合は削除（重複防止）
       newSets[setIndex].items[itemIndex].pokemons = newSets[setIndex].items[
         itemIndex
       ].pokemons.filter((p) => p.id !== pokemonId);
 
       // 追加
       newSets[setIndex].items[itemIndex].pokemons.push(pokemon);
+
+      // プールから削除
+      newSets[setIndex].pool = newSets[setIndex].pool.filter(p => p.id !== pokemonId);
+
       setSets(newSets);
       setSelectedPokemon(null);
       return;
     }
 
-    // 項目からプールへの移動
-    if (!activeId.startsWith('pool-') && activePokemonId && overId.startsWith('pool-drop-')) {
-      const setId = activeSetId;
-      const itemId = activeItemId;
-      const pokemonId = activeParts[2] ?? activePokemonId;
-
-      const setIndex = sets.findIndex((s) => s.id === setId);
-      if (setIndex === -1) return;
-
-      const newSets = [...sets];
-      const itemIndex = newSets[setIndex].items.findIndex((i) => i.id === itemId);
-      if (itemIndex === -1) return;
-
-      newSets[setIndex].items[itemIndex].pokemons = newSets[setIndex].items[
-        itemIndex
-      ].pokemons.filter((p) => p.id !== pokemonId);
-      setSets(newSets);
-      setSelectedPokemon(null);
-      return;
-    }
-
-    // 項目間の移動（同じセット内のみ・別の項目へ）
-    const targetItemIdFromDrop = overItemIdFromDrop ?? '';
+    // C. 項目 -> プール (Remove)
     if (
-      activeSetId === overSetId &&
-      activeItemId &&
-      targetItemIdFromDrop &&
-      overId.startsWith('drop:') &&
-      activeItemId !== targetItemIdFromDrop
+      activeData.type === 'item-poke' &&
+      (overData.type === 'pool-zone' || overData.type === 'pool-poke')
     ) {
-      const setId = activeSetId;
-      const sourceItemId = activeItemId;
-      const targetItemId = targetItemIdFromDrop;
-      const pokemonId = activePokemonId;
+      // 同一セットか確認
+      if (activeData.setId !== overData.setId) return;
+
+      const setId = activeData.setId;
+      const pokemonId = activeData.pokemonId;
+      const sourceItemId = activeData.itemId;
 
       const setIndex = sets.findIndex((s) => s.id === setId);
       if (setIndex === -1) return;
 
-      const pokemon = sets[setIndex].items
-        .find((i) => i.id === sourceItemId)
-        ?.pokemons.find((p) => p.id === pokemonId);
+      const set = sets[setIndex];
+      const sourceItem = set.items.find(i => i.id === sourceItemId);
+      if (!sourceItem) return;
+      const pokemon = sourceItem.pokemons.find(p => p.id === pokemonId);
       if (!pokemon) return;
 
       const newSets = [...sets];
+      const itemIndex = newSets[setIndex].items.findIndex((i) => i.id === sourceItemId);
+      if (itemIndex === -1) return;
+
+      // 項目から削除
+      newSets[setIndex].items[itemIndex].pokemons = newSets[setIndex].items[
+        itemIndex
+      ].pokemons.filter((p) => p.id !== pokemonId);
+
+      // プールに戻す（重複チェック）
+      if (!newSets[setIndex].pool.some(p => p.id === pokemonId)) {
+        newSets[setIndex].pool.push(pokemon);
+        // 元の順序に並び替え
+        newSets[setIndex].pool.sort((a, b) => {
+          const indexA = samplePokemons.findIndex(p => p.id === a.id);
+          const indexB = samplePokemons.findIndex(p => p.id === b.id);
+          return indexA - indexB;
+        });
+      }
+
+      setSets(newSets);
+      setSelectedPokemon(null);
+      return;
+    }
+
+    // D. 項目 -> 項目 (Move)
+    if (
+      activeData.type === 'item-poke' &&
+      (overData.type === 'item-zone' || overData.type === 'item-poke') &&
+      activeData.itemId !== overData.itemId
+    ) {
+      // 同一セットか確認
+      if (activeData.setId !== overData.setId) return;
+
+      const setId = activeData.setId;
+      const pokemonId = activeData.pokemonId;
+      const sourceItemId = activeData.itemId;
+      const targetItemId = overData.itemId;
+
+      const setIndex = sets.findIndex((s) => s.id === setId);
+      if (setIndex === -1) return;
+
+      const sourceItem = sets[setIndex].items.find(i => i.id === sourceItemId);
+      if (!sourceItem) return;
+
+      const pokemon = sourceItem.pokemons.find(p => p.id === pokemonId);
+      if (!pokemon) return;
+
+      const newSets = [...sets];
+
       // 元の項目から削除
-      const sourceItemIndex = newSets[setIndex].items.findIndex(
-        (i) => i.id === sourceItemId
-      );
+      const sourceItemIndex = newSets[setIndex].items.findIndex(i => i.id === sourceItemId);
       if (sourceItemIndex !== -1) {
-        newSets[setIndex].items[sourceItemIndex].pokemons = newSets[setIndex].items[
-          sourceItemIndex
-        ].pokemons.filter((p) => p.id !== pokemonId);
+        newSets[setIndex].items[sourceItemIndex].pokemons =
+          newSets[setIndex].items[sourceItemIndex].pokemons.filter(p => p.id !== pokemonId);
       }
 
       // ターゲット項目に追加
-      const targetItemIndex = newSets[setIndex].items.findIndex(
-        (i) => i.id === targetItemId
-      );
+      const targetItemIndex = newSets[setIndex].items.findIndex(i => i.id === targetItemId);
       if (targetItemIndex !== -1) {
         newSets[setIndex].items[targetItemIndex].pokemons.push(pokemon);
       }
@@ -400,20 +486,22 @@ function App() {
 
   const activePokemon = activeId
     ? (() => {
-        const parts = (activeId as string).split('-');
-        if (parts[0] === 'pool') {
-          return samplePokemons.find((p) => p.id === parts[1]);
-        } else if (parts.length >= 3) {
-          const setId = parts[0];
-          const itemId = parts[1];
-          const pokemonId = parts[2];
-          const set = sets.find((s) => s.id === setId);
-          return set?.items
-            .find((i) => i.id === itemId)
-            ?.pokemons.find((p) => p.id === pokemonId);
-        }
-        return null;
-      })()
+      const data = parseDragId(activeId as string);
+      if (!data) return null;
+
+      if (data.type === 'pool-poke') {
+        // pool-{setId}-{pokemonId}
+        return samplePokemons.find((p) => p.id === data.pokemonId);
+      }
+
+      if (data.type === 'item-poke') {
+        // {setId}-{itemId}-{pokemonId}
+        const set = sets.find(s => s.id === data.setId);
+        return set?.items.find(i => i.id === data.itemId)?.pokemons.find(p => p.id === data.pokemonId);
+      }
+
+      return null;
+    })()
     : null;
 
   return (
@@ -432,7 +520,7 @@ function App() {
 
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCenter}
+        collisionDetection={pointerWithin}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >

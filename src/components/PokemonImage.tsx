@@ -45,15 +45,46 @@ const imageContainer = css`
 `;
 
 const imageContainerDragging = css`
-  ${imageContainer}
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
   opacity: 0.5;
   transform: rotate(5deg);
 `;
 
 const imageContainerSelected = css`
-  ${imageContainer}
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
   border: 3px solid #2196f3;
   box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3), 0 4px 8px rgba(0, 0, 0, 0.3);
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3), 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
   
   @keyframes pulse {
     0%, 100% {
@@ -96,8 +127,8 @@ export function PokemonImage({
   const containerClass = isDragging
     ? imageContainerDragging
     : isSelected
-    ? imageContainerSelected
-    : imageContainer;
+      ? imageContainerSelected
+      : imageContainer;
 
   return (
     <div className={containerClass} onClick={onClick}>

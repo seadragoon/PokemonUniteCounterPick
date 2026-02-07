@@ -2,7 +2,7 @@ import { css } from '@linaria/core';
 import type { Set, Pokemon } from '../types';
 import { SetItemComponent } from './SetItemComponent';
 import { SortablePokemon } from './SortablePokemon';
-import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 
 interface SetComponentProps {
@@ -69,11 +69,37 @@ const controlButton = css`
 `;
 
 const deleteButton = css`
-  ${controlButton}
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
   background: #f44336;
+  color: white;
 
   &:hover {
     background: #da190b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   }
 `;
 
@@ -129,7 +155,14 @@ const poolGrid = css`
 `;
 
 const poolGridDroppable = css`
-  ${poolGrid}
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 10px;
+  min-height: 80px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  
   background: rgba(102, 126, 234, 0.1);
   border: 2px dashed #667eea;
 `;
@@ -142,6 +175,14 @@ const emptyPoolMessage = css`
   justify-content: center;
   width: 100%;
   min-height: 60px;
+`;
+
+const itemsWrapper = css`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+  width: 100%;
 `;
 
 export function SetComponent({
@@ -190,17 +231,19 @@ export function SetComponent({
         </div>
       </div>
 
-      {set.items.map((item) => (
-        <SetItemComponent
-          key={item.id}
-          item={item}
-          setId={set.id}
-          selectedPokemon={selectedPokemon}
-          onNameChange={handleItemNameChange}
-          onPokemonClick={onPokemonClick}
-          onClick={() => onItemClick(item.id)}
-        />
-      ))}
+      <div className={itemsWrapper}>
+        {set.items.map((item) => (
+          <SetItemComponent
+            key={item.id}
+            item={item}
+            setId={set.id}
+            selectedPokemon={selectedPokemon}
+            onNameChange={handleItemNameChange}
+            onPokemonClick={onPokemonClick}
+            onClick={() => onItemClick(item.id)}
+          />
+        ))}
+      </div>
 
       <button className={poolToggle} onClick={togglePool}>
         {set.isPoolOpen ? '▼ プールを閉じる' : '▶ プールを開く'}
@@ -217,14 +260,14 @@ export function SetComponent({
             <div className={emptyPoolMessage}>プールは空です</div>
           ) : (
             <SortableContext
-              items={set.pool.map((p) => `pool-${p.id}`)}
-              strategy={horizontalListSortingStrategy}
+              items={set.pool.map((p) => `pool-${set.id}-${p.id}`)}
+              strategy={rectSortingStrategy}
             >
               {set.pool.map((pokemon) => (
                 <SortablePokemon
                   key={pokemon.id}
                   pokemon={pokemon}
-                  id={`pool-${pokemon.id}`}
+                  id={`pool-${set.id}-${pokemon.id}`}
                   isSelected={selectedPokemon?.id === pokemon.id}
                   onClick={() => onPokemonClick(pokemon)}
                 />
