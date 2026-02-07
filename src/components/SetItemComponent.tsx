@@ -16,6 +16,10 @@ interface SetItemComponentProps {
   onDelete: () => void;
   onAdd: (newItemName: string) => void;
   canDelete: boolean;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  isFirst: boolean;
+  isLast: boolean;
 }
 
 const itemContainer = css`
@@ -77,7 +81,7 @@ const pokemonsContainer = css`
   background: rgba(255, 255, 255, 0.5);
   transition: all 0.2s;
   flex: 1;
-  padding-right: 40px; /* settings button space */
+  padding-right: 10px;
 `;
 
 const pokemonsContainerDroppable = css`
@@ -92,7 +96,7 @@ const pokemonsContainerDroppable = css`
   flex: 1;
   background: rgba(102, 126, 234, 0.15);
   box-shadow: inset 0 0 0 2px #667eea;
-  padding-right: 40px; /* settings button space */
+  padding-right: 10px;
 `;
 
 const emptyMessage = css`
@@ -106,13 +110,27 @@ const emptyMessage = css`
   min-height: 40px;
 `;
 
-const settingsButton = css`
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
+const controlsContainer = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: rgba(102, 126, 234, 0.05);
+  border-left: 1px solid rgba(102, 126, 234, 0.2);
+  flex-shrink: 0;
+`;
+
+const moveButtonsColumn = css`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const controlButton = css`
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -123,9 +141,40 @@ const settingsButton = css`
   border-radius: 4px;
   transition: all 0.2s;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: rgba(0, 0, 0, 0.05);
     color: #667eea;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+`;
+
+const moveButton = css`
+  width: 32px;
+  height: 24px; /* Slightly shorter for stacking */
+  font-size: 1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+  line-height: 1;
+
+  &:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.05);
+    color: #667eea;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
   }
 `;
 
@@ -139,6 +188,10 @@ export function SetItemComponent({
   onDelete,
   onAdd,
   canDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast,
 }: SetItemComponentProps) {
   const [name, setName] = useState(item.name);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -225,16 +278,42 @@ export function SetItemComponent({
         )}
       </div>
 
-      <button
-        className={settingsButton}
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsModalOpen(true);
-        }}
-        title="項目設定"
-      >
-        ⚙
-      </button>
+      <div className={controlsContainer}>
+        <button
+          className={controlButton}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsModalOpen(true);
+          }}
+          title="項目設定"
+        >
+          ⚙
+        </button>
+        <div className={moveButtonsColumn}>
+          <button
+            className={moveButton}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isFirst) onMoveUp();
+            }}
+            disabled={isFirst}
+            title="上へ移動"
+          >
+            ▲
+          </button>
+          <button
+            className={moveButton}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isLast) onMoveDown();
+            }}
+            disabled={isLast}
+            title="下へ移動"
+          >
+            ▼
+          </button>
+        </div>
+      </div>
 
       <SetItemEditModal
         isOpen={isModalOpen}

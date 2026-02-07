@@ -3,13 +3,13 @@ import { css } from '@linaria/core';
 import { ModalBase } from './ModalBase';
 
 interface SetItemEditModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    itemName: string;
-    onRename: (newName: string) => void;
-    onDelete: () => void;
-    onAdd: (newItemName: string) => void;
-    canDelete: boolean;
+  isOpen: boolean;
+  onClose: () => void;
+  itemName: string;
+  onRename: (newName: string) => void;
+  onDelete: () => void;
+  onAdd: (newItemName: string) => void;
+  canDelete: boolean;
 }
 
 const section = css`
@@ -53,12 +53,12 @@ const deleteButton = css`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  background-color: #ffebee;
-  color: #d32f2f;
+  background-color: #ffcdd2; /* Increased visibility */
+  color: #c62828; /* Darker text for contrast */
   margin-top: 8px;
 
   &:hover:not(:disabled) {
-    background-color: #ffcdd2;
+    background-color: #ef9a9a;
   }
 
   &:disabled {
@@ -78,95 +78,100 @@ const addButton = css`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  background-color: #e8f5e9;
+  background-color: #c8e6c9; /* Increased visibility */
   color: #2e7d32;
   margin-top: 8px;
+  min-width: 60px;
 
   &:hover {
-    background-color: #c8e6c9;
+    background-color: #a5d6a7;
   }
 `;
 
 export function SetItemEditModal({
-    isOpen,
-    onClose,
-    itemName,
-    onRename,
-    onDelete,
-    onAdd,
-    canDelete,
+  isOpen,
+  onClose,
+  itemName,
+  onRename,
+  onDelete,
+  onAdd,
+  canDelete,
 }: SetItemEditModalProps) {
-    const [tempName, setTempName] = useState(itemName);
-    const [newItemName, setNewItemName] = useState('');
+  const [tempName, setTempName] = useState(itemName);
+  const [newItemName, setNewItemName] = useState('');
 
-    // Reset state when modal opens
-    useEffect(() => {
-        if (isOpen) {
-            setTempName(itemName);
-            setNewItemName('');
-        }
-    }, [isOpen, itemName]);
+  // Reset state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setTempName(itemName);
+      setNewItemName('');
+    }
+  }, [isOpen, itemName]);
 
-    // Handle closing - save rename changes
-    const handleClose = () => {
-        if (tempName.trim() !== itemName) {
-            onRename(tempName.trim() || itemName);
-        }
-        onClose();
-    };
+  // Handle closing - save rename changes
+  const handleClose = () => {
+    if (tempName.trim() !== itemName) {
+      onRename(tempName.trim() || itemName);
+    }
+    onClose();
+  };
 
-    const handleDelete = () => {
-        onDelete();
-        onClose();
-    };
+  const handleDelete = () => {
+    onDelete();
+    onClose();
+  };
 
-    const handleAdd = () => {
-        onAdd(newItemName.trim() || '項目名');
-        onClose();
-    };
+  const handleAdd = () => {
+    onAdd(newItemName.trim() || '項目名');
+    onClose();
+  };
 
-    return (
-        <ModalBase isOpen={isOpen} onClose={handleClose} title="項目設定">
-            {/* Name Edit Section */}
-            <div className={section}>
-                <label className={label}>この項目のラベルを編集</label>
-                <input
-                    type="text"
-                    className={input}
-                    value={tempName}
-                    onChange={(e) => setTempName(e.target.value)}
-                    placeholder="項目名を入力"
-                />
-            </div>
+  return (
+    <ModalBase isOpen={isOpen} onClose={handleClose} title="項目設定">
+      {/* Name Edit Section */}
+      <div className={section}>
+        <label className={label}>この項目のラベルを編集</label>
+        <input
+          type="text"
+          className={input}
+          value={tempName}
+          onChange={(e) => setTempName(e.target.value)}
+          placeholder="項目名を入力"
+        />
+      </div>
 
-            {/* Delete Section */}
-            <div className={section}>
-                <label className={label}>この項目を削除</label>
-                <button
-                    className={deleteButton}
-                    onClick={handleDelete}
-                    disabled={!canDelete}
-                >
-                    削除
-                </button>
-            </div>
+      {/* Delete Section */}
+      <div className={section}>
+        <label className={label}>この項目を削除</label>
+        <button
+          className={deleteButton}
+          onClick={handleDelete}
+          disabled={!canDelete}
+        >
+          削除
+        </button>
+      </div>
 
-            <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '20px 0' }} />
+      <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '20px 0' }} />
 
-            {/* Add Section */}
-            <div className={section}>
-                <label className={label}>項目を追加（この下に追加されます）</label>
-                <input
-                    type="text"
-                    className={input}
-                    value={newItemName}
-                    onChange={(e) => setNewItemName(e.target.value)}
-                    placeholder="新しい項目名（空欄で「項目名」）"
-                />
-                <button className={addButton} onClick={handleAdd}>
-                    追加
-                </button>
-            </div>
-        </ModalBase>
-    );
+      {/* Add Section */}
+      <div className={section}>
+        <label className={label}>項目を追加（この下に追加されます）</label>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <input
+            type="text"
+            className={input}
+            value={newItemName}
+            onChange={(e) => setNewItemName(e.target.value)}
+            placeholder="新しい項目名"
+          />
+          <button className={addButton} style={{ width: 'auto', marginTop: 0 }} onClick={handleAdd}>
+            追加
+          </button>
+        </div>
+      </div>
+
+
+    </ModalBase>
+  );
 }

@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { css } from '@linaria/core';
 
 interface ModalBaseProps {
-    isOpen: boolean;
-    onClose: () => void;
-    title: string;
-    children: React.ReactNode;
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
 }
 
 const overlay = css`
@@ -79,40 +79,44 @@ const content = css`
   padding: 20px;
 `;
 
+import { createPortal } from 'react-dom';
+
 export function ModalBase({ isOpen, onClose, title, children }: ModalBaseProps) {
-    useEffect(() => {
-        const handleEsc = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onClose();
-        };
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
 
-        if (isOpen) {
-            document.addEventListener('keydown', handleEsc);
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
-        }
+    if (isOpen) {
+      document.addEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
 
-        return () => {
-            document.removeEventListener('keydown', handleEsc);
-            document.body.style.overflow = '';
-        };
-    }, [isOpen, onClose]);
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, onClose]);
 
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
-    return (
-        <div className={overlay} onClick={(e) => {
-            if (e.target === e.currentTarget) onClose();
-        }}>
-            <div className={modalContainer}>
-                <div className={header}>
-                    <h2 className={titleStyle}>{title}</h2>
-                    <button className={closeButton} onClick={onClose} aria-label="Close">
-                        &times;
-                    </button>
-                </div>
-                <div className={content}>
-                    {children}
-                </div>
-            </div>
+  return createPortal(
+    <div
+      className={overlay}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className={modalContainer}>
+        <div className={header}>
+          <h2 className={titleStyle}>{title}</h2>
+          <button className={closeButton} onClick={onClose} aria-label="Close">
+            &times;
+          </button>
         </div>
-    );
+        <div className={content}>{children}</div>
+      </div>
+    </div>,
+    document.body
+  );
 }

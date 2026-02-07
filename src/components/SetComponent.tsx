@@ -2,7 +2,7 @@ import { css } from '@linaria/core';
 import type { Set, Pokemon } from '../types';
 import { SetItemComponent } from './SetItemComponent';
 import { SortablePokemon } from './SortablePokemon';
-import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
+import { SortableContext, rectSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { samplePokemons } from '../data/pokemon';
 
@@ -233,7 +233,7 @@ export function SetComponent({
       </div>
 
       <div className={itemsWrapper}>
-        {set.items.map((item) => (
+        {set.items.map((item, index) => (
           <SetItemComponent
             key={item.id}
             item={item}
@@ -283,6 +283,20 @@ export function SetComponent({
               });
             }}
             canDelete={set.items.length > 1}
+            onMoveUp={() => {
+              if (index > 0) {
+                const newItems = arrayMove(set.items, index, index - 1);
+                onUpdate({ ...set, items: newItems });
+              }
+            }}
+            onMoveDown={() => {
+              if (index < set.items.length - 1) {
+                const newItems = arrayMove(set.items, index, index + 1);
+                onUpdate({ ...set, items: newItems });
+              }
+            }}
+            isFirst={index === 0}
+            isLast={index === set.items.length - 1}
           />
         ))}
       </div>
