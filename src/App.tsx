@@ -140,7 +140,7 @@ function App() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 5, // 5px移動したらドラッグ開始（クリックと区別）
       },
     }),
     useSensor(TouchSensor, {
@@ -255,14 +255,58 @@ function App() {
     const { active, over } = event;
     setActiveId(null);
 
-    if (!over || active.id === over.id) {
+    // 同じ場所にドロップした場合は何もしない
+    if (active.id === over?.id) {
       return;
     }
 
     const activeData = parseDragId(active.id as string);
-    const overData = parseDragId(over.id as string);
+    const overData = over ? parseDragId(over.id as string) : null;
 
-    if (!activeData || !overData) return;
+    if (!activeData) return;
+
+    // E. 項目 -> 範囲外 (Remove / Return to Pool)
+    // ドロップ先がない、または無効な場所にドロップした場合、かつ元が項目内のポケモンであればプールに戻す
+    if (activeData.type === 'item-poke' && !overData) {
+      const setId = activeData.setId;
+      const pokemonId = activeData.pokemonId;
+      const sourceItemId = activeData.itemId;
+
+      const setIndex = sets.findIndex((s) => s.id === setId);
+      if (setIndex === -1) return;
+
+      const set = sets[setIndex];
+      const sourceItem = set.items.find(i => i.id === sourceItemId);
+      if (!sourceItem) return;
+      const pokemon = sourceItem.pokemons.find(p => p.id === pokemonId);
+      if (!pokemon) return;
+
+      const newSets = [...sets];
+      const itemIndex = newSets[setIndex].items.findIndex((i) => i.id === sourceItemId);
+      if (itemIndex === -1) return;
+
+      // 項目から削除
+      newSets[setIndex].items[itemIndex].pokemons = newSets[setIndex].items[
+        itemIndex
+      ].pokemons.filter((p) => p.id !== pokemonId);
+
+      // プールに戻す（重複チェック）
+      if (!newSets[setIndex].pool.some(p => p.id === pokemonId)) {
+        newSets[setIndex].pool.push(pokemon);
+        // 元の順序に並び替え
+        newSets[setIndex].pool.sort((a, b) => {
+          const indexA = samplePokemons.findIndex(p => p.id === a.id);
+          const indexB = samplePokemons.findIndex(p => p.id === b.id);
+          return indexA - indexB;
+        });
+      }
+
+      setSets(newSets);
+      setSelectedPokemon(null);
+      return;
+    }
+
+    if (!overData) return;
 
     // A. セット内並び替え (Item -> Same Item)
     if (

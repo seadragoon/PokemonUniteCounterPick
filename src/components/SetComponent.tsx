@@ -4,6 +4,7 @@ import { SetItemComponent } from './SetItemComponent';
 import { SortablePokemon } from './SortablePokemon';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
+import { samplePokemons } from '../data/pokemon';
 
 interface SetComponentProps {
   set: Set;
@@ -241,6 +242,47 @@ export function SetComponent({
             onNameChange={handleItemNameChange}
             onPokemonClick={onPokemonClick}
             onClick={() => onItemClick(item.id)}
+            onDelete={() => {
+              const itemIndex = set.items.findIndex(i => i.id === item.id);
+              if (itemIndex === -1) return;
+
+              const itemToDelete = set.items[itemIndex];
+              const pokemonsToReturn = itemToDelete.pokemons;
+
+              const newPool = [...set.pool, ...pokemonsToReturn].sort((a, b) => {
+                const indexA = samplePokemons.findIndex(p => p.id === a.id);
+                const indexB = samplePokemons.findIndex(p => p.id === b.id);
+                return indexA - indexB;
+              });
+
+              const newItems = set.items.filter(i => i.id !== item.id);
+
+              onUpdate({
+                ...set,
+                items: newItems,
+                pool: newPool
+              });
+            }}
+            onAdd={(newItemName) => {
+              const itemIndex = set.items.findIndex(i => i.id === item.id);
+              if (itemIndex === -1) return;
+
+              const ts = Date.now();
+              const newItem = {
+                id: `item_${ts}`,
+                name: newItemName,
+                pokemons: []
+              };
+
+              const newItems = [...set.items];
+              newItems.splice(itemIndex + 1, 0, newItem);
+
+              onUpdate({
+                ...set,
+                items: newItems
+              });
+            }}
+            canDelete={set.items.length > 1}
           />
         ))}
       </div>

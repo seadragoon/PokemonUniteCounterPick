@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { css } from '@linaria/core';
-import { SortableContext, horizontalListSortingStrategy, rectSortingStrategy } from '@dnd-kit/sortable';
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import type { SetItem, Pokemon } from '../types';
 import { SortablePokemon } from './SortablePokemon';
 import { useDroppable, useDndContext } from '@dnd-kit/core';
+import { SetItemEditModal } from './SetItemEditModal';
 
 interface SetItemComponentProps {
   item: SetItem;
@@ -12,6 +13,9 @@ interface SetItemComponentProps {
   onNameChange: (itemId: string, newName: string) => void;
   onPokemonClick: (pokemon: Pokemon) => void;
   onClick: () => void;
+  onDelete: () => void;
+  onAdd: (newItemName: string) => void;
+  canDelete: boolean;
 }
 
 const itemContainer = css`
@@ -24,6 +28,7 @@ const itemContainer = css`
   display: flex;
   flex-direction: row;
   align-items: stretch;
+  position: relative;
 `;
 
 const itemHeader = css`
@@ -72,6 +77,7 @@ const pokemonsContainer = css`
   background: rgba(255, 255, 255, 0.5);
   transition: all 0.2s;
   flex: 1;
+  padding-right: 40px; /* settings button space */
 `;
 
 const pokemonsContainerDroppable = css`
@@ -86,6 +92,7 @@ const pokemonsContainerDroppable = css`
   flex: 1;
   background: rgba(102, 126, 234, 0.15);
   box-shadow: inset 0 0 0 2px #667eea;
+  padding-right: 40px; /* settings button space */
 `;
 
 const emptyMessage = css`
@@ -99,6 +106,29 @@ const emptyMessage = css`
   min-height: 40px;
 `;
 
+const settingsButton = css`
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #667eea;
+  }
+`;
+
 export function SetItemComponent({
   item,
   setId,
@@ -106,8 +136,12 @@ export function SetItemComponent({
   onNameChange,
   onPokemonClick,
   onClick,
+  onDelete,
+  onAdd,
+  canDelete,
 }: SetItemComponentProps) {
   const [name, setName] = useState(item.name);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const droppableId = `drop:${setId}:${item.id}`;
   const { setNodeRef } = useDroppable({
@@ -176,7 +210,7 @@ export function SetItemComponent({
         ) : (
           <SortableContext
             items={item.pokemons.map((p) => `${setId}-${item.id}-${p.id}`)}
-            strategy={horizontalListSortingStrategy}
+            strategy={rectSortingStrategy}
           >
             {item.pokemons.map((pokemon) => (
               <SortablePokemon
@@ -190,6 +224,30 @@ export function SetItemComponent({
           </SortableContext>
         )}
       </div>
+
+      <button
+        className={settingsButton}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsModalOpen(true);
+        }}
+        title="項目設定"
+      >
+        ⚙
+      </button>
+
+      <SetItemEditModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        itemName={name}
+        onRename={(newName) => {
+          setName(newName);
+          onNameChange(item.id, newName);
+        }}
+        onDelete={onDelete}
+        onAdd={onAdd}
+        canDelete={canDelete}
+      />
     </div>
   );
 }
