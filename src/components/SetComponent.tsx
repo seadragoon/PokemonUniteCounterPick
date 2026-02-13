@@ -1,14 +1,18 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { css } from '@linaria/core';
 import type { Set, Pokemon } from '../types';
 import { SetItemComponent } from './SetItemComponent';
 import { SortablePokemon } from './SortablePokemon';
+import { SetEditModal } from './SetEditModal';
 import { SortableContext, rectSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { samplePokemons } from '../data/pokemon';
 
 interface SetComponentProps {
   set: Set;
+  index: number;
+  isFirst: boolean;
+  isLast: boolean;
   onUpdate: (set: Set) => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
@@ -31,42 +35,77 @@ const setHeader = css`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  flex-wrap: wrap;
+  gap: 15px;
+`;
+
+const setTitleSection = css`
+  display: flex;
+  align-items: center;
   gap: 10px;
 `;
 
 const setControls = css`
   display: flex;
+  align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
 `;
 
-const controlButton = css`
-  padding: 8px 16px;
+const arrowButtons = css`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+
+const arrowButton = css`
+  width: 32px;
+  height: 24px;
+  font-size: 1rem;
   border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  background: transparent;
   cursor: pointer;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
   transition: all 0.2s;
-  background: #667eea;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  line-height: 1;
 
-  &:hover {
-    background: #5568d3;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  }
-
-  &:active {
-    transform: translateY(0);
+  &:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.05);
+    color: #667eea;
   }
 
   &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
+    opacity: 0.3;
+    cursor: default;
+  }
+`;
+
+const editButton = css`
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+  margin-left: 6px;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+    color: #667eea;
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
@@ -189,6 +228,9 @@ const itemsWrapper = css`
 
 const SetComponentInner = ({
   set,
+  index,
+  isFirst,
+  isLast,
   onUpdate,
   onMoveUp,
   onMoveDown,
@@ -197,6 +239,7 @@ const SetComponentInner = ({
   onPokemonClick,
   onItemClick,
 }: SetComponentProps) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const handleItemNameChange = (itemId: string, newName: string) => {
     const updatedSet = {
       ...set,
@@ -205,6 +248,10 @@ const SetComponentInner = ({
       ),
     };
     onUpdate(updatedSet);
+  };
+
+  const handleSetNameChange = (newName: string) => {
+    onUpdate({ ...set, name: newName });
   };
 
   const togglePool = () => {
@@ -216,17 +263,40 @@ const SetComponentInner = ({
     id: poolDroppableId,
   });
 
+  const displayName = set.name || `セット${index + 1}`;
+
   return (
     <div className={setContainer}>
       <div className={setHeader}>
-        <h2 style={{ margin: 0, color: '#333' }}>セット {set.id}</h2>
+        <div className={setTitleSection}>
+          <h2 style={{ margin: 0, color: '#333' }}>{displayName}</h2>
+          <button
+            className={editButton}
+            onClick={() => setIsEditModalOpen(true)}
+            title="セット名を編集"
+          >
+            ✏️
+          </button>
+        </div>
         <div className={setControls}>
-          <button className={controlButton} onClick={onMoveUp}>
-            ↑ 上へ
-          </button>
-          <button className={controlButton} onClick={onMoveDown}>
-            ↓ 下へ
-          </button>
+          <div className={arrowButtons}>
+            <button
+              className={arrowButton}
+              onClick={onMoveUp}
+              disabled={isFirst}
+              title="上へ"
+            >
+              ˄
+            </button>
+            <button
+              className={arrowButton}
+              onClick={onMoveDown}
+              disabled={isLast}
+              title="下へ"
+            >
+              ˅
+            </button>
+          </div>
           <button className={deleteButton} onClick={onDelete}>
             削除
           </button>
@@ -333,6 +403,13 @@ const SetComponentInner = ({
           )}
         </div>
       </div>
+
+      <SetEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        setName={displayName}
+        onRename={handleSetNameChange}
+      />
     </div>
   );
 };

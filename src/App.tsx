@@ -597,10 +597,13 @@ function App() {
               <p>セットがありません。+ セット追加ボタンで新しいセットを作成してください。</p>
             </div>
           ) : (
-            sets.map((set) => (
+            sets.map((set, index) => (
               <SetComponent
                 key={set.id}
                 set={set}
+                index={index}
+                isFirst={index === 0}
+                isLast={index === sets.length - 1}
                 onUpdate={(updatedSet) => handleSetUpdate(set.id, updatedSet)}
                 onMoveUp={() => handleSetMove(set.id, 'up')}
                 onMoveDown={() => handleSetMove(set.id, 'down')}

@@ -23,6 +23,7 @@ export interface SetItem {
 
 export interface Set {
   id: string;
+  name?: string;
   items: SetItem[];
   pool: Pokemon[];
   isPoolOpen: boolean;
