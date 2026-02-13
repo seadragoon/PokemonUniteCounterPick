@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { css } from '@linaria/core';
 import {
   DndContext,
@@ -203,6 +203,7 @@ function App() {
   };
 
   const handleDragStart = (event: DragStartEvent) => {
+    console.log("Drag Start: " + event.active.id);
     setActiveId(event.active.id as string);
   };
 
@@ -252,7 +253,10 @@ function App() {
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
+    console.log("Drag End: " + event.active.id);
     const { active, over } = event;
+    console.log("Active: ", active);
+    console.log("Over: ", over);
     setActiveId(null);
 
     // 同じ場所にドロップした場合は何もしない
@@ -465,68 +469,77 @@ function App() {
     }
   };
 
-  const handleSetMove = (setId: string, direction: 'up' | 'down') => {
-    const setIndex = sets.findIndex((s) => s.id === setId);
-    if (setIndex === -1) return;
+  const handleSetMove = useCallback((setId: string, direction: 'up' | 'down') => {
+    setSets((prevSets) => {
+      const setIndex = prevSets.findIndex((s) => s.id === setId);
+      if (setIndex === -1) return prevSets;
 
-    if (direction === 'up' && setIndex > 0) {
-      setSets(arrayMove(sets, setIndex, setIndex - 1));
-    } else if (direction === 'down' && setIndex < sets.length - 1) {
-      setSets(arrayMove(sets, setIndex, setIndex + 1));
-    }
-  };
+      if (direction === 'up' && setIndex > 0) {
+        return arrayMove(prevSets, setIndex, setIndex - 1);
+      } else if (direction === 'down' && setIndex < prevSets.length - 1) {
+        return arrayMove(prevSets, setIndex, setIndex + 1);
+      }
+      return prevSets;
+    });
+  }, []);
 
-  const handleSetDelete = (setId: string) => {
+  const handleSetDelete = useCallback((setId: string) => {
     if (window.confirm('このセットを削除しますか？')) {
-      setSets(sets.filter((s) => s.id !== setId));
+      setSets((prevSets) => prevSets.filter((s) => s.id !== setId));
     }
-  };
+  }, []);
 
-  const handleSetUpdate = (setId: string, updatedSet: Set) => {
-    setSets(sets.map((s) => (s.id === setId ? updatedSet : s)));
-  };
+  const handleSetUpdate = useCallback((setId: string, updatedSet: Set) => {
+    setSets((prevSets) => prevSets.map((s) => (s.id === setId ? updatedSet : s)));
+  }, []);
 
-  const handlePokemonClick = (setId: string, pokemon: Pokemon) => {
-    if (selectedPokemon?.setId === setId && selectedPokemon?.pokemon.id === pokemon.id) {
-      setSelectedPokemon(null);
-    } else {
-      setSelectedPokemon({ setId, pokemon });
-    }
-  };
-
-  const handleItemClick = (setId: string, itemId: string) => {
-    if (selectedPokemon) {
-      const setIndex = sets.findIndex((s) => s.id === setId);
-      if (setIndex === -1) return;
-
-      const sourceItem = sets[setIndex].items.find((i) =>
-        i.pokemons.some((p) => p.id === selectedPokemon.pokemon.id)
-      );
-      if (!sourceItem) return;
-
-      const newSets = [...sets];
-      // 元の項目から削除
-      const sourceItemIndex = newSets[setIndex].items.findIndex(
-        (i) => i.id === sourceItem.id
-      );
-      if (sourceItemIndex !== -1) {
-        newSets[setIndex].items[sourceItemIndex].pokemons = newSets[setIndex].items[
-          sourceItemIndex
-        ].pokemons.filter((p) => p.id !== selectedPokemon.pokemon.id);
+  const handlePokemonClick = useCallback((setId: string, pokemon: Pokemon) => {
+    setSelectedPokemon((prev) => {
+      if (prev?.setId === setId && prev?.pokemon.id === pokemon.id) {
+        return null;
       }
+      return { setId, pokemon };
+    });
+  }, []);
 
-      // ターゲット項目に追加
-      const targetItemIndex = newSets[setIndex].items.findIndex((i) => i.id === itemId);
-      if (targetItemIndex !== -1) {
-        newSets[setIndex].items[targetItemIndex].pokemons.push(
-          selectedPokemon.pokemon
+  const handleItemClick = useCallback((setId: string, itemId: string) => {
+    setSelectedPokemon((prevSelectedPokemon) => {
+      if (!prevSelectedPokemon) return prevSelectedPokemon;
+
+      setSets((prevSets) => {
+        const setIndex = prevSets.findIndex((s) => s.id === setId);
+        if (setIndex === -1) return prevSets;
+
+        const sourceItem = prevSets[setIndex].items.find((i) =>
+          i.pokemons.some((p) => p.id === prevSelectedPokemon.pokemon.id)
         );
-      }
+        if (!sourceItem) return prevSets;
 
-      setSets(newSets);
-      setSelectedPokemon(null);
-    }
-  };
+        const newSets = [...prevSets];
+        // 元の項目から削除
+        const sourceItemIndex = newSets[setIndex].items.findIndex(
+          (i) => i.id === sourceItem.id
+        );
+        if (sourceItemIndex !== -1) {
+          newSets[setIndex].items[sourceItemIndex].pokemons = newSets[setIndex].items[
+            sourceItemIndex
+          ].pokemons.filter((p) => p.id !== prevSelectedPokemon.pokemon.id);
+        }
+
+        // ターゲット項目に追加
+        const targetItemIndex = newSets[setIndex].items.findIndex((i) => i.id === itemId);
+        if (targetItemIndex !== -1) {
+          newSets[setIndex].items[targetItemIndex].pokemons.push(
+            prevSelectedPokemon.pokemon
+          );
+        }
+
+        return newSets;
+      });
+
+      return null;
+    });
+  }, []);
 
   const activePokemon = activeId
     ? (() => {

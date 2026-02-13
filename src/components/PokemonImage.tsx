@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { css } from '@linaria/core';
 import { type Pokemon, Role } from '../types';
 
@@ -117,12 +118,12 @@ const background = css`
   z-index: 0; /* 明示的に低くする */
 `;
 
-export function PokemonImage({
+const PokemonImageInner = ({
   pokemon,
   isDragging = false,
   isSelected = false,
   onClick,
-}: PokemonImageProps) {
+}: PokemonImageProps) => {
   const roleColor = getRoleColor(pokemon.role);
   const containerClass = isDragging
     ? imageContainerDragging
@@ -146,4 +147,7 @@ export function PokemonImage({
       />
     </div>
   );
-}
+};
+
+// React.memoでメモ化してパフォーマンスを最適化
+export const PokemonImage = memo(PokemonImageInner);

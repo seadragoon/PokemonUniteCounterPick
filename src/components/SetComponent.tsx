@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { css } from '@linaria/core';
 import type { Set, Pokemon } from '../types';
 import { SetItemComponent } from './SetItemComponent';
@@ -186,7 +187,7 @@ const itemsWrapper = css`
   width: 100%;
 `;
 
-export function SetComponent({
+const SetComponentInner = ({
   set,
   onUpdate,
   onMoveUp,
@@ -195,7 +196,7 @@ export function SetComponent({
   selectedPokemon,
   onPokemonClick,
   onItemClick,
-}: SetComponentProps) {
+}: SetComponentProps) => {
   const handleItemNameChange = (itemId: string, newName: string) => {
     const updatedSet = {
       ...set,
@@ -334,4 +335,7 @@ export function SetComponent({
       </div>
     </div>
   );
-}
+};
+
+// React.memoでメモ化してパフォーマンスを最適化
+export const SetComponent = memo(SetComponentInner);

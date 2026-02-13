@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Pokemon } from '../types';
@@ -10,12 +11,12 @@ interface SortablePokemonProps {
   onClick?: () => void;
 }
 
-export function SortablePokemon({
+const SortablePokemonInner = ({
   pokemon,
   id,
   isSelected = false,
   onClick,
-}: SortablePokemonProps) {
+}: SortablePokemonProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id });
 
@@ -30,4 +31,7 @@ export function SortablePokemon({
       <PokemonImage pokemon={pokemon} isSelected={isSelected} onClick={onClick} />
     </div>
   );
-}
+};
+
+// React.memoでメモ化してパフォーマンスを最適化
+export const SortablePokemon = memo(SortablePokemonInner);
