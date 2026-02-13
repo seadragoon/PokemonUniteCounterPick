@@ -22,6 +22,7 @@ const STORAGE_KEY = 'pokemon-unite-counter-pick';
 const appContainer = css`
   min-height: 100vh;
   padding: 20px;
+  padding-top: 90px; /* ヘッダーの高さ分のスペースを確保 */
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -29,13 +30,22 @@ const appContainer = css`
 `;
 
 const header = css`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
   max-width: 1200px;
-  margin: 0 auto 30px;
+  margin: 0 auto;
+  padding: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 15px;
+  background: rgba(102, 126, 234, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 `;
 
 const title = css`
