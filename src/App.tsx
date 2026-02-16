@@ -648,17 +648,16 @@ function App() {
           </button>
         </div>
 
-        <div className={buttonGroup}>
-          {viewMode === 'edit' && (
-            <>
-              <button className={addButton} onClick={handleAddSet}>
-                + セット追加
-              </button>
-              <button className={resetButton} onClick={handleReset}>
-                Reset
-              </button>
-            </>
-          )}
+        <div
+          className={buttonGroup}
+          style={{ visibility: viewMode === 'edit' ? 'visible' : 'hidden' }}
+        >
+          <button className={addButton} onClick={handleAddSet}>
+            + セット追加
+          </button>
+          <button className={resetButton} onClick={handleReset}>
+            Reset
+          </button>
         </div>
       </header>
 
