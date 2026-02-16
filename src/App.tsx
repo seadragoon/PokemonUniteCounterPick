@@ -15,6 +15,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import type { Set, Pokemon } from './types';
 import { samplePokemons } from './data/pokemon';
 import { SetComponent } from './components/SetComponent';
+import { SetViewComponent } from './components/SetViewComponent';
 import { PokemonImage } from './components/PokemonImage';
 
 const STORAGE_KEY = 'pokemon-unite-counter-pick';
@@ -27,6 +28,59 @@ const appContainer = css`
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+`;
+
+const viewModeContainer = css`
+  max-width: 1400px;
+  margin: 0 auto;
+  column-count: 1;
+  column-gap: 20px;
+  padding: 0 10px;
+
+  @media (min-width: 768px) {
+    column-count: 2;
+  }
+
+  @media (min-width: 1200px) {
+    column-count: 3;
+    padding: 0;
+  }
+`;
+
+const toggleButtonGroup = css`
+  display: flex;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px;
+  border-radius: 8px;
+  gap: 4px;
+`;
+
+const toggleButton = css`
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+
+  &:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+  }
+`;
+
+const activeToggleButton = css`
+  background: white;
+  color: #667eea;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: white;
+    color: #667eea;
+  }
 `;
 
 const header = css`
@@ -146,6 +200,8 @@ function App() {
     setId: string;
     pokemon: Pokemon;
   } | null>(null);
+  // モード管理: 'edit' | 'view'
+  const [viewMode, setViewMode] = useState<'edit' | 'view'>('edit');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -573,55 +629,93 @@ function App() {
 
   return (
     <div className={appContainer}>
-      <div className={header}>
-        <h1 className={title}>ポケモンユナイト カウンターピック</h1>
-        <div className={buttonGroup}>
-          <button className={addButton} onClick={handleAddSet}>
-            + セット追加
+      <header className={header}>
+        <h1 className={title}>Pokemon Unite Counter Pick</h1>
+
+        {/* モード切り替えボタン */}
+        <div className={toggleButtonGroup}>
+          <button
+            className={`${toggleButton} ${viewMode === 'edit' ? activeToggleButton : ''}`}
+            onClick={() => setViewMode('edit')}
+          >
+            編集モード
           </button>
-          <button className={resetButton} onClick={handleReset}>
-            Reset
+          <button
+            className={`${toggleButton} ${viewMode === 'view' ? activeToggleButton : ''}`}
+            onClick={() => setViewMode('view')}
+          >
+            表示モード
           </button>
         </div>
-      </div>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={pointerWithin}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <div className={setsContainer}>
+        <div className={buttonGroup}>
+          {viewMode === 'edit' && (
+            <>
+              <button className={addButton} onClick={handleAddSet}>
+                + セット追加
+              </button>
+              <button className={resetButton} onClick={handleReset}>
+                Reset
+              </button>
+            </>
+          )}
+        </div>
+      </header>
+
+      {viewMode === 'view' ? (
+        <div className={viewModeContainer}>
           {sets.length === 0 ? (
             <div className={emptyState}>
-              <p>セットがありません。+ セット追加ボタンで新しいセットを作成してください。</p>
+              <p>セットがありません。編集モードでセットを作成してください。</p>
             </div>
           ) : (
             sets.map((set, index) => (
-              <SetComponent
+              <SetViewComponent
                 key={set.id}
                 set={set}
                 index={index}
-                isFirst={index === 0}
-                isLast={index === sets.length - 1}
-                onUpdate={(updatedSet) => handleSetUpdate(set.id, updatedSet)}
-                onMoveUp={() => handleSetMove(set.id, 'up')}
-                onMoveDown={() => handleSetMove(set.id, 'down')}
-                onDelete={() => handleSetDelete(set.id)}
-                selectedPokemon={
-                  selectedPokemon?.setId === set.id ? selectedPokemon.pokemon : null
-                }
-                onPokemonClick={(pokemon) => handlePokemonClick(set.id, pokemon)}
-                onItemClick={(itemId) => handleItemClick(set.id, itemId)}
               />
             ))
           )}
         </div>
-
-        <DragOverlay>
-          {activePokemon ? <PokemonImage pokemon={activePokemon} isDragging /> : null}
-        </DragOverlay>
-      </DndContext>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={pointerWithin}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <div className={setsContainer}>
+            {sets.length === 0 ? (
+              <div className={emptyState}>
+                <p>セットがありません。+ セット追加ボタンで新しいセットを作成してください。</p>
+              </div>
+            ) : (
+              sets.map((set, index) => (
+                <SetComponent
+                  key={set.id}
+                  set={set}
+                  index={index}
+                  isFirst={index === 0}
+                  isLast={index === sets.length - 1}
+                  onUpdate={(updatedSet) => handleSetUpdate(set.id, updatedSet)}
+                  onMoveUp={() => handleSetMove(set.id, 'up')}
+                  onMoveDown={() => handleSetMove(set.id, 'down')}
+                  onDelete={() => handleSetDelete(set.id)}
+                  selectedPokemon={
+                    selectedPokemon?.setId === set.id ? selectedPokemon.pokemon : null
+                  }
+                  onPokemonClick={(pokemon) => handlePokemonClick(set.id, pokemon)}
+                  onItemClick={(itemId) => handleItemClick(set.id, itemId)}
+                />
+              ))
+            )}
+          </div>
+          <DragOverlay>
+            {activePokemon ? <PokemonImage pokemon={activePokemon} isDragging /> : null}
+          </DragOverlay>
+        </DndContext>
+      )}
     </div>
   );
 }
