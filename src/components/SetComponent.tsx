@@ -20,6 +20,7 @@ interface SetComponentProps {
   selectedPokemon: Pokemon | null;
   onPokemonClick: (pokemon: Pokemon) => void;
   onItemClick: (itemId: string) => void;
+  onPoolClick: () => void;
 }
 
 const setContainer = css`
@@ -208,6 +209,23 @@ const poolGridDroppable = css`
   border: 2px dashed #667eea;
 `;
 
+const poolGridClickable = css`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 10px;
+  min-height: 80px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.02);
+  transition: all 0.2s;
+  cursor: pointer;
+  
+  &:hover {
+    background: rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 2px #667eea;
+  }
+`;
+
 const emptyPoolMessage = css`
   color: #999;
   font-size: 0.9rem;
@@ -238,6 +256,7 @@ const SetComponentInner = ({
   selectedPokemon,
   onPokemonClick,
   onItemClick,
+  onPoolClick,
 }: SetComponentProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const handleItemNameChange = (itemId: string, newName: string) => {
@@ -264,6 +283,13 @@ const SetComponentInner = ({
   });
 
   const displayName = set.name || `セット${index + 1}`;
+
+  // 選択中のポケモンが項目のポケモンなら、プールをクリックしたときに移動できるようハイライト
+  const isSelectedFromItem = selectedPokemon && set.items.some(i => i.pokemons.some(p => p.id === selectedPokemon.id));
+
+  const poolClass = isPoolOver
+    ? poolGridDroppable
+    : (isSelectedFromItem ? poolGridClickable : poolGrid);
 
   return (
     <div className={setContainer}>
@@ -381,7 +407,12 @@ const SetComponentInner = ({
       >
         <div
           ref={poolRef}
-          className={isPoolOver ? poolGridDroppable : poolGrid}
+          className={poolClass}
+          onClick={() => {
+            if (isSelectedFromItem) {
+              onPoolClick();
+            }
+          }}
         >
           {set.pool.length === 0 ? (
             <div className={emptyPoolMessage}>プールは空です</div>

@@ -579,7 +579,31 @@ function App() {
         const sourceItem = prevSets[setIndex].items.find((i) =>
           i.pokemons.some((p) => p.id === prevSelectedPokemon.pokemon.id)
         );
-        if (!sourceItem) return prevSets;
+
+        // プールからの移動処理
+        if (!sourceItem) {
+          const poolPokemonIndex = prevSets[setIndex].pool.findIndex(
+            (p) => p.id === prevSelectedPokemon.pokemon.id
+          );
+
+          if (poolPokemonIndex !== -1) {
+            const newSets = [...prevSets];
+            const pokemon = newSets[setIndex].pool[poolPokemonIndex];
+
+            // プールから削除
+            newSets[setIndex].pool = newSets[setIndex].pool.filter(
+              (p) => p.id !== prevSelectedPokemon.pokemon.id
+            );
+
+            // ターゲット項目に追加
+            const targetItemIndex = newSets[setIndex].items.findIndex((i) => i.id === itemId);
+            if (targetItemIndex !== -1) {
+              newSets[setIndex].items[targetItemIndex].pokemons.push(pokemon);
+            }
+            return newSets;
+          }
+          return prevSets;
+        }
 
         const newSets = [...prevSets];
         // 元の項目から削除
@@ -604,6 +628,52 @@ function App() {
       });
 
       return null;
+    });
+  }, []);
+
+  const handlePoolClick = useCallback((setId: string) => {
+    setSelectedPokemon((prevSelectedPokemon) => {
+      if (!prevSelectedPokemon) return prevSelectedPokemon; // 何も選択されていない場合は何もしない
+
+      setSets((prevSets) => {
+        const setIndex = prevSets.findIndex((s) => s.id === setId);
+        if (setIndex === -1) return prevSets;
+
+        // 選択中のポケモンがどの項目にいるか探す
+        const sourceItem = prevSets[setIndex].items.find((i) =>
+          i.pokemons.some((p) => p.id === prevSelectedPokemon.pokemon.id)
+        );
+
+        // 項目にいない（＝既にプールにいる、または別セットなど）場合は何もしない
+        if (!sourceItem) return prevSets;
+
+        const newSets = [...prevSets];
+
+        // 元の項目から削除
+        const sourceItemIndex = newSets[setIndex].items.findIndex(
+          (i) => i.id === sourceItem.id
+        );
+        if (sourceItemIndex !== -1) {
+          newSets[setIndex].items[sourceItemIndex].pokemons = newSets[setIndex].items[
+            sourceItemIndex
+          ].pokemons.filter((p) => p.id !== prevSelectedPokemon.pokemon.id);
+        }
+
+        // プールに追加（重複チェック）
+        if (!newSets[setIndex].pool.some(p => p.id === prevSelectedPokemon.pokemon.id)) {
+          newSets[setIndex].pool.push(prevSelectedPokemon.pokemon);
+          // ソート
+          newSets[setIndex].pool.sort((a, b) => {
+            const indexA = samplePokemons.findIndex(p => p.id === a.id);
+            const indexB = samplePokemons.findIndex(p => p.id === b.id);
+            return indexA - indexB;
+          });
+        }
+
+        return newSets;
+      });
+
+      return null; // 選択解除
     });
   }, []);
 
@@ -706,6 +776,7 @@ function App() {
                   }
                   onPokemonClick={(pokemon) => handlePokemonClick(set.id, pokemon)}
                   onItemClick={(itemId) => handleItemClick(set.id, itemId)}
+                  onPoolClick={() => handlePoolClick(set.id)}
                 />
               ))
             )}

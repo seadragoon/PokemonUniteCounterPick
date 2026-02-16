@@ -84,6 +84,25 @@ const pokemonsContainer = css`
   padding-right: 10px;
 `;
 
+const pokemonsContainerClickable = css`
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 4px;
+  min-height: 40px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  transition: all 0.2s;
+  flex: 1;
+  padding-right: 10px;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(102, 126, 234, 0.1);
+    box-shadow: inset 0 0 0 2px #667eea;
+  }
+`;
+
 const pokemonsContainerDroppable = css`
   display: flex;
   flex-wrap: wrap;
@@ -207,6 +226,13 @@ export function SetItemComponent({
   const isOverChild = typeof over?.id === 'string' && (over.id as string).startsWith(`${setId}-${item.id}-`);
   const isHovering = isOverContainer || isOverChild;
 
+  // 選択中で、かつ選択中のポケモンが自分自身に含まれていない場合にクリッカブルにする
+  const isClickable = selectedPokemon && !item.pokemons.some(p => p.id === selectedPokemon.id);
+
+  const containerClass = isHovering
+    ? pokemonsContainerDroppable
+    : (isClickable ? pokemonsContainerClickable : pokemonsContainer);
+
   const handleNameBlur = () => {
     if (name.trim()) {
       onNameChange(item.id, name.trim());
@@ -241,7 +267,7 @@ export function SetItemComponent({
       </div>
       <div
         ref={setNodeRef}
-        className={isHovering ? pokemonsContainerDroppable : pokemonsContainer}
+        className={containerClass}
         onClick={(e) => {
           if (selectedPokemon && e.target === e.currentTarget) {
             onClick();
