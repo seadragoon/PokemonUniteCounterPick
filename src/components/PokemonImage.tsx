@@ -12,13 +12,13 @@ interface PokemonImageProps {
 const getRoleColor = (role: Role): string => {
   switch (role) {
     case Role.Attacker:
-      return '#ff9800'; // オレンジ
+      return '#ff3700ff'; // オレンジ
     case Role.Defender:
       return '#4caf50'; // 緑
     case Role.Speedster:
       return '#2196f3'; // 青
     case Role.Support:
-      return '#ffeb3b'; // 黄色
+      return '#ffb700ff'; // 黄色
     case Role.AllRounder:
       return '#9c27b0'; // 紫
     default:
