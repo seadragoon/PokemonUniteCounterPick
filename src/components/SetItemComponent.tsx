@@ -33,6 +33,10 @@ const itemContainer = css`
   flex-direction: row;
   align-items: stretch;
   position: relative;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const itemHeader = css`
@@ -45,6 +49,13 @@ const itemHeader = css`
   border-right: 1px solid rgba(102, 126, 234, 0.3);
   width: 160px;
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+    justify-content: center; /* タイトル入力欄を中央寄せ */
+  }
 `;
 
 const itemNameInput = css`

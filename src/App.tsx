@@ -65,6 +65,8 @@ const toggleButton = css`
   transition: all 0.2s;
   background: transparent;
   color: rgba(255, 255, 255, 0.8);
+  flex: 1;
+  text-align: center;
 
   &:hover {
     color: white;
@@ -100,6 +102,11 @@ const header = css`
   background: rgba(102, 126, 234, 0.95);
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  @media (max-width: 768px) {
+    gap: 0;
+    padding: 8px 12px;
+  }
 `;
 
 const title = css`
@@ -108,12 +115,86 @@ const title = css`
   font-weight: bold;
   margin: 0;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  
+  @media (max-width: 768px) {
+    font-size: 1.4rem;
+  }
+`;
+
+const hamburgerButton = css`
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 40px;
+  height: 40px;
+  
+  span {
+    display: block;
+    width: 24px;
+    height: 3px;
+    background-color: white;
+    border-radius: 2px;
+    transition: all 0.3s;
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+
+const mobileMenu = css`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    
+    /* アニメーション用プロパティ */
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin-top 0.3s ease, padding-top 0.3s ease;
+    
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0); 
+    align-items: stretch;
+    
+    &.open {
+      max-height: 500px;
+      opacity: 1;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  }
 `;
 
 const buttonGroup = css`
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    justify-content: stretch;
+    flex-direction: column;
+    width: 100%;
+    
+    /* トランジション用 */
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin-top 0.3s ease;
+    overflow: hidden;
+    
+    button {
+      width: 100%;
+    }
+  }
 `;
 
 
@@ -202,16 +283,25 @@ function App() {
   } | null>(null);
   // モード管理: 'edit' | 'view'
   const [viewMode, setViewMode] = useState<'edit' | 'view'>('edit');
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // メニュー開閉状態
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // 5px移動したらドラッグ開始（クリックと区別）
+        distance: isMobile ? 10000 : 5, // モバイルの場合はドラッグ無効化（実質的に）
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 250,
+        delay: isMobile ? 100000 : 250, // モバイルの場合はドラッグ無効化
         tolerance: 5,
       },
     })
@@ -290,7 +380,7 @@ function App() {
       // "pool-" を除いた残りを "-" で分割
       // setIdにハイフンが含まれる場合（set_timestampなど）を考慮し、最初の要素だけを取り出すのではなく、
       // id構造が fixed prefix なので、pokemonIdが最後であると仮定するか、setIdの構造に依存する。
-      // 現在の実装では setId = `set_${ts}` (アンダースコア) なのでハイフンは安全だが、
+      // 現在の実装では `id` は `set_...` (アンダースコア) なのでハイフンは安全だが、
       // 将来的にsetIdにハイフンが入ると壊れる。
       // ただし `pool-drop-` と区別が必要。
       // ここでは `pool-` プレフィックスの後、最初のハイフン区切り...ではなく、
@@ -559,14 +649,7 @@ function App() {
     setSets((prevSets) => prevSets.map((s) => (s.id === setId ? updatedSet : s)));
   }, []);
 
-  const handlePokemonClick = useCallback((setId: string, pokemon: Pokemon) => {
-    setSelectedPokemon((prev) => {
-      if (prev?.setId === setId && prev?.pokemon.id === pokemon.id) {
-        return null;
-      }
-      return { setId, pokemon };
-    });
-  }, []);
+
 
   const handleItemClick = useCallback((setId: string, itemId: string) => {
     setSelectedPokemon((prevSelectedPokemon) => {
@@ -677,6 +760,35 @@ function App() {
     });
   }, []);
 
+  const handlePokemonClick = useCallback((setId: string, pokemon: Pokemon) => {
+    // 既にポケモン選択中で、別のポケモンをクリックした場合
+    if (selectedPokemon && selectedPokemon.pokemon.id !== pokemon.id) {
+      const set = sets.find(s => s.id === setId);
+      if (set) {
+        // クリックされたポケモンがどの項目にいるか確認
+        const targetItem = set.items.find(item => item.pokemons.some(p => p.id === pokemon.id));
+        if (targetItem) {
+          // その項目へ移動
+          handleItemClick(setId, targetItem.id);
+          return;
+        }
+        // プールにいる場合
+        if (set.pool.some(p => p.id === pokemon.id)) {
+          // プールへ移動
+          handlePoolClick(setId);
+          return;
+        }
+      }
+    }
+
+    setSelectedPokemon((prev) => {
+      if (prev?.setId === setId && prev?.pokemon.id === pokemon.id) {
+        return null;
+      }
+      return { setId, pokemon };
+    });
+  }, [selectedPokemon, sets, handleItemClick, handlePoolClick]);
+
   const activePokemon = activeId
     ? (() => {
       const data = parseDragId(activeId as string);
@@ -700,34 +812,68 @@ function App() {
   return (
     <div className={appContainer}>
       <header className={header}>
-        <h1 className={title}>Pokemon Unite Counter Pick</h1>
-
-        {/* モード切り替えボタン */}
-        <div className={toggleButtonGroup}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flex: '1' }}>
+          <h1 className={title}>Pokemon Unite Counter Pick</h1>
           <button
-            className={`${toggleButton} ${viewMode === 'edit' ? activeToggleButton : ''}`}
-            onClick={() => setViewMode('edit')}
+            className={hamburgerButton}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
           >
-            編集モード
-          </button>
-          <button
-            className={`${toggleButton} ${viewMode === 'view' ? activeToggleButton : ''}`}
-            onClick={() => setViewMode('view')}
-          >
-            表示モード
+            <span style={{ transform: isMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
+            <span style={{ opacity: isMenuOpen ? 0 : 1 }} />
+            <span style={{ transform: isMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
           </button>
         </div>
 
-        <div
-          className={buttonGroup}
-          style={{ visibility: viewMode === 'edit' ? 'visible' : 'hidden' }}
-        >
-          <button className={addButton} onClick={handleAddSet}>
-            + セット追加
-          </button>
-          <button className={resetButton} onClick={handleReset}>
-            Reset
-          </button>
+        <div className={`${mobileMenu} ${isMenuOpen ? 'open' : ''}`}>
+          {/* モード切り替えボタン */}
+          <div className={toggleButtonGroup}>
+            <button
+              className={`${toggleButton} ${viewMode === 'edit' ? activeToggleButton : ''}`}
+              onClick={() => {
+                setViewMode('edit');
+                // メニューは閉じない
+              }}
+            >
+              編集モード
+            </button>
+            <button
+              className={`${toggleButton} ${viewMode === 'view' ? activeToggleButton : ''}`}
+              onClick={() => {
+                setViewMode('view');
+                // メニューは閉じない
+              }}
+            >
+              表示モード
+            </button>
+          </div>
+
+          <div
+            className={buttonGroup}
+            style={
+              window.innerWidth <= 768
+                ? {
+                  transition:
+                    'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin-top 0.3s ease',
+                  maxHeight: viewMode === 'edit' ? '120px' : '0px',
+                  opacity: viewMode === 'edit' ? 1 : 0,
+                  marginTop: viewMode === 'edit' ? '10px' : '0px',
+                  overflow: 'hidden',
+                  pointerEvents: viewMode === 'edit' ? 'auto' : 'none',
+                  width: '100%',
+                }
+                : {
+                  visibility: viewMode === 'edit' ? 'visible' : 'hidden',
+                }
+            }
+          >
+            <button className={addButton} onClick={() => { handleAddSet(); setIsMenuOpen(false); }}>
+              + セット追加
+            </button>
+            <button className={resetButton} onClick={() => { handleReset(); setIsMenuOpen(false); }}>
+              Reset
+            </button>
+          </div>
         </div>
       </header>
 
