@@ -337,7 +337,35 @@ function App() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
-        setSets(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        // 旧形式（文字列ID）から新形式（数値ID）へのマイグレーション
+        const migrated = parsed.map((set: Set) => ({
+          ...set,
+          items: set.items.map((item) => ({
+            ...item,
+            pokemons: item.pokemons
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              .map((p: any) => {
+                if (typeof p.id === 'string') {
+                  // 旧IDからen_nameで検索して新ポケモンデータに置換
+                  return samplePokemons.find((sp) => sp.en_name === p.id) || null;
+                }
+                // 既に数値IDなら最新のマスターデータから取り直す
+                return samplePokemons.find((sp) => sp.id === p.id) || null;
+              })
+              .filter(Boolean),
+          })),
+          pool: set.pool
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .map((p: any) => {
+              if (typeof p.id === 'string') {
+                return samplePokemons.find((sp) => sp.en_name === p.id) || null;
+              }
+              return samplePokemons.find((sp) => sp.id === p.id) || null;
+            })
+            .filter(Boolean),
+        }));
+        setSets(migrated);
       } catch (e) {
         console.error('Failed to load saved data:', e);
       }
@@ -419,8 +447,8 @@ function App() {
       // setIdにハイフンを含めない運用前提とする。
       const parts = id.split('-');
       if (parts.length >= 3) {
-        // pool-set_123-pikachu
-        return { type: 'pool-poke', setId: parts[1], pokemonId: parts.slice(2).join('-') } as const;
+        // pool-set_123-101
+        return { type: 'pool-poke', setId: parts[1], pokemonId: Number(parts.slice(2).join('-')) } as const;
       }
       return null;
     }
@@ -428,7 +456,7 @@ function App() {
       // {setId}-{itemId}-{pokemonId}
       const parts = id.split('-');
       if (parts.length >= 3) {
-        return { type: 'item-poke', setId: parts[0], itemId: parts[1], pokemonId: parts.slice(2).join('-') } as const;
+        return { type: 'item-poke', setId: parts[0], itemId: parts[1], pokemonId: Number(parts.slice(2).join('-')) } as const;
       }
     }
     return null;

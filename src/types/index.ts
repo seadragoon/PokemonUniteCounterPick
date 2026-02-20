@@ -9,8 +9,9 @@ export const Role = {
 export type Role = (typeof Role)[keyof typeof Role];
 
 export interface Pokemon {
-  id: string;
+  id: number;
   name: string;
+  en_name: string;
   role: Role;
   image: string;
 }
