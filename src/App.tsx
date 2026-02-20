@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { css } from '@linaria/core';
 import {
   DndContext,
@@ -22,11 +22,12 @@ import { useSetsStorage } from './hooks/useSetsStorage';
 const appContainer = css`
   min-height: 100vh;
   padding: 20px;
-  padding-top: 90px; /* ヘッダーの高さ分のスペースを確保 */
+  padding-top: 70px; /* JSで動的に上書き */
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  transition: padding-top 0.3s ease;
 `;
 
 const viewModeContainer = css`
@@ -36,7 +37,7 @@ const viewModeContainer = css`
   column-gap: 20px;
   padding: 0 10px;
 
-  @media (min-width: 768px) {
+  @media (min-width: 820px) {
     column-count: 2;
   }
 
@@ -53,6 +54,7 @@ const toggleButtonGroup = css`
   border-radius: 8px;
   gap: 4px;
 `;
+
 
 const toggleButton = css`
   padding: 8px 16px;
@@ -90,32 +92,91 @@ const header = css`
   left: 0;
   right: 0;
   z-index: 1000;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 10px;
+  padding: 10px 24px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
+  flex-direction: column;
+  gap: 0;
   background: rgba(102, 126, 234, 0.95);
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-  @media (max-width: 768px) {
-    gap: 0;
+  @media (max-width: 820px) {
     padding: 8px 12px;
+  }
+`;
+
+const headerRow1 = css`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+`;
+
+const headerRow1Right = css`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  @media (max-width: 820px) {
+    display: none;
+  }
+`;
+
+const headerRow2 = css`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding-top 0.3s ease;
+  padding-top: 0;
+
+  &.open {
+    max-height: 60px;
+    opacity: 1;
+    padding-top: 8px;
+  }
+
+  @media (max-width: 820px) {
+    display: none;
+  }
+`;
+
+const row2ToggleButton = css`
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  @media (max-width: 820px) {
+    display: none;
   }
 `;
 
 const title = css`
   color: white;
-  font-size: 2rem;
+  /* 820px→1.4rem, 920px→2rem に滑らかに変化 */
+  font-size: clamp(1.4rem, calc(1.4rem + (2 - 1.4) * ((100vw - 820px) / (920 - 820))), 2rem);
   font-weight: bold;
   margin: 0;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  
-  @media (max-width: 768px) {
+  white-space: nowrap;
+
+  @media (max-width: 820px) {
     font-size: 1.4rem;
   }
 `;
@@ -140,17 +201,17 @@ const hamburgerButton = css`
     transition: all 0.3s;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 820px) {
     display: flex;
   }
 `;
 
 const mobileMenu = css`
-  display: flex;
+  display: none;
   gap: 10px;
   align-items: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: 820px) {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -176,12 +237,35 @@ const mobileMenu = css`
   }
 `;
 
+const menuOverlay = css`
+  display: none;
+
+  @media (max-width: 820px) {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+
+    &.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+`;
+
 const buttonGroup = css`
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
 
-  @media (max-width: 768px) {
+  @media (max-width: 820px) {
     justify-content: stretch;
     flex-direction: column;
     width: 100%;
@@ -335,15 +419,31 @@ function App() {
   } | null>(null);
   // モード管理: 'edit' | 'view'
   const [viewMode, setViewMode] = useState<'edit' | 'view'>('edit');
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // メニュー開閉状態
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isRow2Open, setIsRow2Open] = useState(true); // PCヘッダー2段目の開閉
+  const headerRef = useRef<HTMLElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(70);
 
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 820);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    const handleResize = () => setIsMobile(window.innerWidth <= 820);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // ヘッダー高さを測定してpadding-topを動的に設定
+  useEffect(() => {
+    const measure = () => {
+      if (headerRef.current) {
+        setHeaderHeight(headerRef.current.offsetHeight);
+      }
+    };
+    measure();
+    // アニメーション後に再測定
+    const timer = setTimeout(measure, 350);
+    return () => clearTimeout(timer);
+  }, [isRow2Open, viewMode, isMenuOpen, isMobile]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -859,10 +959,39 @@ function App() {
     : null;
 
   return (
-    <div className={appContainer}>
-      <header className={header}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flex: '1' }}>
+    <div className={appContainer} style={{ paddingTop: headerHeight + 16 }}>
+      <header className={header} ref={headerRef}>
+        {/* 1段目: タイトル + 共有ボタン + モード切替 + 開閉ボタン */}
+        <div className={headerRow1}>
           <h1 className={title}>PokemonUnite Counter Pick</h1>
+          <div className={headerRow1Right}>
+            <button className={shareButton} onClick={handleShare} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              リンク作成
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+            </button>
+            <div className={toggleButtonGroup}>
+              <button
+                className={`${toggleButton} ${viewMode === 'edit' ? activeToggleButton : ''}`}
+                onClick={() => setViewMode('edit')}
+              >
+                編集モード
+              </button>
+              <button
+                className={`${toggleButton} ${viewMode === 'view' ? activeToggleButton : ''}`}
+                onClick={() => setViewMode('view')}
+              >
+                表示モード
+              </button>
+            </div>
+            <button
+              className={row2ToggleButton}
+              onClick={() => setIsRow2Open(!isRow2Open)}
+              title={isRow2Open ? 'ツールバーを閉じる' : 'ツールバーを開く'}
+              style={viewMode === 'view' ? { visibility: 'hidden', pointerEvents: 'none' } : undefined}
+            >
+              {isRow2Open ? '▲' : '▼'}
+            </button>
+          </div>
           <button
             className={hamburgerButton}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -874,24 +1003,28 @@ function App() {
           </button>
         </div>
 
+        {/* 2段目 (PC): アクションボタン群 右寄せ・開閉可能 */}
+        <div className={`${headerRow2} ${isRow2Open && viewMode === 'edit' ? 'open' : ''}`}>
+          <button className={addButton} onClick={handleAddSet}>
+            + セット追加
+          </button>
+          <button className={resetButton} onClick={handleReset}>
+            Reset
+          </button>
+        </div>
+
+        {/* モバイルメニュー */}
         <div className={`${mobileMenu} ${isMenuOpen ? 'open' : ''}`}>
-          {/* モード切り替えボタン */}
           <div className={toggleButtonGroup}>
             <button
               className={`${toggleButton} ${viewMode === 'edit' ? activeToggleButton : ''}`}
-              onClick={() => {
-                setViewMode('edit');
-                // メニューは閉じない
-              }}
+              onClick={() => setViewMode('edit')}
             >
               編集モード
             </button>
             <button
               className={`${toggleButton} ${viewMode === 'view' ? activeToggleButton : ''}`}
-              onClick={() => {
-                setViewMode('view');
-                // メニューは閉じない
-              }}
+              onClick={() => setViewMode('view')}
             >
               表示モード
             </button>
@@ -899,28 +1032,22 @@ function App() {
 
           <div
             className={buttonGroup}
-            style={
-              window.innerWidth <= 768
-                ? {
-                  transition:
-                    'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin-top 0.3s ease',
-                  maxHeight: viewMode === 'edit' ? '120px' : '0px',
-                  opacity: viewMode === 'edit' ? 1 : 0,
-                  marginTop: viewMode === 'edit' ? '10px' : '0px',
-                  overflow: 'hidden',
-                  pointerEvents: viewMode === 'edit' ? 'auto' : 'none',
-                  width: '100%',
-                }
-                : {
-                  visibility: viewMode === 'edit' ? 'visible' : 'hidden',
-                }
-            }
+            style={{
+              transition: 'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin-top 0.3s ease',
+              maxHeight: viewMode === 'edit' ? '200px' : '0px',
+              opacity: viewMode === 'edit' ? 1 : 0,
+              marginTop: viewMode === 'edit' ? '10px' : '0px',
+              overflow: 'hidden',
+              pointerEvents: viewMode === 'edit' ? 'auto' : 'none',
+              width: '100%',
+            }}
           >
             <button className={addButton} onClick={() => { handleAddSet(); setIsMenuOpen(false); }}>
               + セット追加
             </button>
-            <button className={shareButton} onClick={() => { handleShare(); setIsMenuOpen(false); }}>
-              共有URLをコピー
+            <button className={shareButton} onClick={() => { handleShare(); setIsMenuOpen(false); }} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+              リンク作成
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
             </button>
             <button className={resetButton} onClick={() => { handleReset(); setIsMenuOpen(false); }}>
               Reset
@@ -928,6 +1055,12 @@ function App() {
           </div>
         </div>
       </header>
+
+      {/* モバイルメニュー用オーバーレイ */}
+      <div
+        className={`${menuOverlay} ${isMenuOpen ? 'active' : ''}`}
+        onClick={() => setIsMenuOpen(false)}
+      />
 
       {viewMode === 'view' ? (
         <div className={viewModeContainer}>

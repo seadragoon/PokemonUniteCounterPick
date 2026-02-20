@@ -35,7 +35,7 @@ const itemContainer = css`
   align-items: stretch;
   position: relative;
 
-  @media (max-width: 768px) {
+  @media (max-width: 820px) {
     flex-direction: column;
   }
 `;
@@ -51,7 +51,7 @@ const itemHeader = css`
   width: 160px;
   flex-shrink: 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: 820px) {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid rgba(102, 126, 234, 0.3);
