@@ -21,6 +21,7 @@ interface SetComponentProps {
   onPokemonClick: (pokemon: Pokemon) => void;
   onItemClick: (itemId: string) => void;
   onPoolClick: () => void;
+  isMobile: boolean;
 }
 
 const setContainer = css`
@@ -257,6 +258,7 @@ const SetComponentInner = ({
   onPokemonClick,
   onItemClick,
   onPoolClick,
+  isMobile,
 }: SetComponentProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const handleItemNameChange = (itemId: string, newName: string) => {
@@ -394,6 +396,7 @@ const SetComponentInner = ({
             }}
             isFirst={index === 0}
             isLast={index === set.items.length - 1}
+            isMobile={isMobile}
           />
         ))}
       </div>
@@ -409,7 +412,7 @@ const SetComponentInner = ({
           ref={poolRef}
           className={poolClass}
           onClick={() => {
-            if (isSelectedFromItem) {
+            if (selectedPokemon) {
               onPoolClick();
             }
           }}

@@ -132,7 +132,15 @@ const PokemonImageInner = ({
       : imageContainer;
 
   return (
-    <div className={containerClass} onClick={onClick}>
+    <div
+      className={containerClass}
+      onClick={(e) => {
+        if (onClick) {
+          e.stopPropagation();
+          onClick();
+        }
+      }}
+    >
       <div
         className={background}
         style={{ backgroundColor: roleColor }}

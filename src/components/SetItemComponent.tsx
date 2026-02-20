@@ -20,6 +20,7 @@ interface SetItemComponentProps {
   onMoveDown: () => void;
   isFirst: boolean;
   isLast: boolean;
+  isMobile: boolean;
 }
 
 const itemContainer = css`
@@ -222,6 +223,7 @@ export function SetItemComponent({
   onMoveDown,
   isFirst,
   isLast,
+  isMobile,
 }: SetItemComponentProps) {
   const [name, setName] = useState(item.name);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -294,8 +296,8 @@ export function SetItemComponent({
             }}
           >
             {selectedPokemon
-              ? 'ここにドロップまたはクリック'
-              : 'ポケモンをドラッグ&ドロップ'}
+              ? (isMobile ? '領域をタップで移動' : 'ここにドロップ')
+              : (isMobile ? 'ポケモンを選択し、領域をタップで決定' : 'ポケモンをドラッグ&ドロップ')}
           </div>
         ) : (
           <SortableContext

@@ -274,6 +274,32 @@ const emptyState = css`
   backdrop-filter: blur(10px);
 `;
 
+const footerStyle = css`
+  max-width: 1200px;
+  margin: 40px auto 0;
+  padding: 0 20px 20px;
+  text-align: center;
+`;
+
+const footerDivider = css`
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  margin-bottom: 16px;
+`;
+
+const footerDisclaimer = css`
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin: 0 0 8px;
+`;
+
+const footerCopyright = css`
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  margin: 0;
+`;
+
 function App() {
   const [sets, setSets] = useState<Set[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -663,6 +689,11 @@ function App() {
           i.pokemons.some((p) => p.id === prevSelectedPokemon.pokemon.id)
         );
 
+        // 同一項目の場合は選択解除のみ（移動しない）
+        if (sourceItem && sourceItem.id === itemId) {
+          return prevSets;
+        }
+
         // プールからの移動処理
         if (!sourceItem) {
           const poolPokemonIndex = prevSets[setIndex].pool.findIndex(
@@ -763,18 +794,26 @@ function App() {
   const handlePokemonClick = useCallback((setId: string, pokemon: Pokemon) => {
     // 既にポケモン選択中で、別のポケモンをクリックした場合
     if (selectedPokemon && selectedPokemon.pokemon.id !== pokemon.id) {
+      // 同一セットの場合は選択変更のみ
+      if (selectedPokemon.setId === setId) {
+        setSelectedPokemon({ setId, pokemon });
+        return;
+      }
+
       const set = sets.find(s => s.id === setId);
       if (set) {
-        // クリックされたポケモンがどの項目にいるか確認
         const targetItem = set.items.find(item => item.pokemons.some(p => p.id === pokemon.id));
+
+        const isTargetPool = !targetItem && set.pool.some(p => p.id === pokemon.id);
+
+        // 別の項目へ移動
         if (targetItem) {
-          // その項目へ移動
           handleItemClick(setId, targetItem.id);
           return;
         }
-        // プールにいる場合
-        if (set.pool.some(p => p.id === pokemon.id)) {
-          // プールへ移動
+
+        // プールへ移動
+        if (isTargetPool) {
           handlePoolClick(setId);
           return;
         }
@@ -813,7 +852,7 @@ function App() {
     <div className={appContainer}>
       <header className={header}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flex: '1' }}>
-          <h1 className={title}>Pokemon Unite Counter Pick</h1>
+          <h1 className={title}>PokemonUnite Counter Pick</h1>
           <button
             className={hamburgerButton}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -923,6 +962,7 @@ function App() {
                   onPokemonClick={(pokemon) => handlePokemonClick(set.id, pokemon)}
                   onItemClick={(itemId) => handleItemClick(set.id, itemId)}
                   onPoolClick={() => handlePoolClick(set.id)}
+                  isMobile={isMobile}
                 />
               ))
             )}
@@ -932,6 +972,17 @@ function App() {
           </DragOverlay>
         </DndContext>
       )}
+
+      <footer className={footerStyle}>
+        <hr className={footerDivider} />
+        <p className={footerDisclaimer}>
+          当サイトはファンによる非営利目的のプロジェクトであり、株式会社ポケモン、Nintendo、Creatures Inc.、GAME FREAK inc.、およびTencent Gamesとは一切関係ありません。
+          『Pokémon UNITE』に関するすべての画像および知的財産権は、各権利者に帰属します。
+        </p>
+        <p className={footerCopyright}>
+          ©2026 Developed by seadragoon
+        </p>
+      </footer>
     </div>
   );
 }
