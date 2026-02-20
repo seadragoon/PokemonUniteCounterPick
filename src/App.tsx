@@ -1086,32 +1086,31 @@ function App() {
           onDragEnd={handleDragEnd}
         >
           <div className={setsContainer}>
-            {sets.length === 0 ? (
-              <div className={emptyState}>
-                <p>セットがありません。+ セット追加ボタンで新しいセットを作成してください。</p>
-              </div>
-            ) : (
-              sets.map((set, index) => (
-                <SetComponent
-                  key={set.id}
-                  set={set}
-                  index={index}
-                  isFirst={index === 0}
-                  isLast={index === sets.length - 1}
-                  onUpdate={(updatedSet) => handleSetUpdate(set.id, updatedSet)}
-                  onMoveUp={() => handleSetMove(set.id, 'up')}
-                  onMoveDown={() => handleSetMove(set.id, 'down')}
-                  onDelete={() => handleSetDelete(set.id)}
-                  selectedPokemon={
-                    selectedPokemon?.setId === set.id ? selectedPokemon.pokemon : null
-                  }
-                  onPokemonClick={(pokemon) => handlePokemonClick(set.id, pokemon)}
-                  onItemClick={(itemId) => handleItemClick(set.id, itemId)}
-                  onPoolClick={() => handlePoolClick(set.id)}
-                  isMobile={isMobile}
-                />
-              ))
-            )}
+            {sets.map((set, index) => (
+              <SetComponent
+                key={set.id}
+                set={set}
+                index={index}
+                isFirst={index === 0}
+                isLast={index === sets.length - 1}
+                onUpdate={(updatedSet) => handleSetUpdate(set.id, updatedSet)}
+                onMoveUp={() => handleSetMove(set.id, 'up')}
+                onMoveDown={() => handleSetMove(set.id, 'down')}
+                onDelete={() => handleSetDelete(set.id)}
+                selectedPokemon={
+                  selectedPokemon?.setId === set.id ? selectedPokemon.pokemon : null
+                }
+                onPokemonClick={(pokemon) => handlePokemonClick(set.id, pokemon)}
+                onItemClick={(itemId) => handleItemClick(set.id, itemId)}
+                onPoolClick={() => handlePoolClick(set.id)}
+                isMobile={isMobile}
+              />
+            ))}
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
+              <button className={addButton} onClick={handleAddSet} style={{ fontSize: '1.1rem', padding: '14px 32px' }}>
+                + セットを追加
+              </button>
+            </div>
           </div>
           <DragOverlay>
             {activePokemon ? <PokemonImage pokemon={activePokemon} isDragging /> : null}
