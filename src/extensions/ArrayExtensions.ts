@@ -1,7 +1,11 @@
-interface Array<T> {
+export { };
+
+declare global {
+  interface Array<T> {
     FirstOrDefault(predicate?: (x: T) => boolean): T | null;
     LastOrDefault(predicate?: (x: T) => boolean): T | null;
     IsInRange(index: number | undefined): boolean;
+  }
 }
 Object.defineProperty(Array.prototype, "FirstOrDefault", {
   configurable: true,
