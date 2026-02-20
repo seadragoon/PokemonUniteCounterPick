@@ -17,7 +17,7 @@ import { samplePokemons } from './data/pokemon';
 import { SetComponent } from './components/SetComponent';
 import { SetViewComponent } from './components/SetViewComponent';
 import { PokemonImage } from './components/PokemonImage';
-import { useSetsStorage } from './hooks/useSetsStorage';
+import { useSetsStorage, isSetSaveable } from './hooks/useSetsStorage';
 
 const appContainer = css`
   min-height: 100vh;
@@ -365,6 +365,20 @@ const shareButton = css`
   &:hover {
     background: #1976d2;
   }
+
+  &:disabled {
+    background: #9e9e9e;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.6;
+
+    &:hover {
+      background: #9e9e9e;
+      transform: none;
+      box-shadow: none;
+    }
+  }
 `;
 
 const setsContainer = css`
@@ -382,6 +396,7 @@ const emptyState = css`
   background: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   backdrop-filter: blur(10px);
+  column-span: all;
 `;
 
 const footerStyle = css`
@@ -412,6 +427,7 @@ const footerCopyright = css`
 
 function App() {
   const { sets, setSets, clearStorage } = useSetsStorage();
+  const hasSaveableData = sets.some(isSetSaveable);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedPokemon, setSelectedPokemon] = useState<{
     setId: string;
@@ -963,9 +979,9 @@ function App() {
       <header className={header} ref={headerRef}>
         {/* 1段目: タイトル + 共有ボタン + モード切替 + 開閉ボタン */}
         <div className={headerRow1}>
-          <h1 className={title}>PokemonUnite Counter Pick</h1>
+          <h1 className={title}>PokemonUnite CounterPick Maker</h1>
           <div className={headerRow1Right}>
-            <button className={shareButton} onClick={handleShare} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <button className={shareButton} onClick={handleShare} disabled={!hasSaveableData} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               リンク作成
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
             </button>
@@ -1045,7 +1061,7 @@ function App() {
             <button className={addButton} onClick={() => { handleAddSet(); setIsMenuOpen(false); }}>
               + セット追加
             </button>
-            <button className={shareButton} onClick={() => { handleShare(); setIsMenuOpen(false); }} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+            <button className={shareButton} onClick={() => { handleShare(); setIsMenuOpen(false); }} disabled={!hasSaveableData} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
               リンク作成
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
             </button>
@@ -1064,12 +1080,12 @@ function App() {
 
       {viewMode === 'view' ? (
         <div className={viewModeContainer}>
-          {sets.length === 0 ? (
+          {!hasSaveableData ? (
             <div className={emptyState}>
               <p>セットがありません。編集モードでセットを作成してください。</p>
             </div>
           ) : (
-            sets.map((set, index) => (
+            sets.filter(isSetSaveable).map((set, index) => (
               <SetViewComponent
                 key={set.id}
                 set={set}

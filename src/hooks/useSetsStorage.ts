@@ -79,16 +79,24 @@ const deserializeSets = (parsed: any[]): RuntimeSet[] => {
     });
 };
 
+/** セットが保存対象かどうかを判定（いずれかの項目にポケモンまたはカスタム名があるか） */
+export const isSetSaveable = (set: RuntimeSet): boolean =>
+    set.items.some((item, ii) =>
+        item.pokemons.length > 0 || item.name !== DEFAULT_ITEM_NAMES[ii]
+    );
+
 /** RuntimeSet を保存形式に変換する（短縮キー、IDなし、pool なし、デフォルト名は省略） */
+/** 全項目が空（ポケモン0個かつデフォルト名）のセットは保存しない */
 const serializeSets = (sets: RuntimeSet[]): SavedSet[] => {
-    return sets.map((set) => ({
-        n: set.name,
-        i: set.items.map((item, ii) => ({
-            // デフォルト名と一致する場合はnを省略して保存データを削減
-            ...(item.name !== DEFAULT_ITEM_NAMES[ii] ? { n: item.name } : {}),
-            p: item.pokemons.map((p) => p.id),
-        })),
-    }));
+    return sets
+        .filter(isSetSaveable)
+        .map((set) => ({
+            n: set.name,
+            i: set.items.map((item, ii) => ({
+                ...(item.name !== DEFAULT_ITEM_NAMES[ii] ? { n: item.name } : {}),
+                p: item.pokemons.map((p) => p.id),
+            })),
+        }));
 };
 
 const createInitialSet = (): RuntimeSet => ({
