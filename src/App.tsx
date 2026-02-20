@@ -17,8 +17,7 @@ import { samplePokemons } from './data/pokemon';
 import { SetComponent } from './components/SetComponent';
 import { SetViewComponent } from './components/SetViewComponent';
 import { PokemonImage } from './components/PokemonImage';
-
-const STORAGE_KEY = 'pokemon-unite-counter-pick';
+import { useSetsStorage } from './hooks/useSetsStorage';
 
 const appContainer = css`
   min-height: 100vh;
@@ -257,6 +256,33 @@ const resetButton = css`
   }
 `;
 
+const shareButton = css`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  background: #2196f3;
+  color: white;
+
+  &:hover {
+    background: #1976d2;
+  }
+`;
+
 const setsContainer = css`
   max-width: 1200px;
   margin: 0 auto;
@@ -301,7 +327,7 @@ const footerCopyright = css`
 `;
 
 function App() {
-  const [sets, setSets] = useState<Set[]>([]);
+  const { sets, setSets, clearStorage } = useSetsStorage();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedPokemon, setSelectedPokemon] = useState<{
     setId: string;
@@ -333,62 +359,6 @@ function App() {
     })
   );
 
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // 旧形式（文字列ID）から新形式（数値ID）へのマイグレーション
-        const migrated = parsed.map((set: Set) => ({
-          ...set,
-          items: set.items.map((item) => ({
-            ...item,
-            pokemons: item.pokemons
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              .map((p: any) => {
-                if (typeof p.id === 'string') {
-                  // 旧IDからen_nameで検索して新ポケモンデータに置換
-                  return samplePokemons.find((sp) => sp.en_name === p.id) || null;
-                }
-                // 既に数値IDなら最新のマスターデータから取り直す
-                return samplePokemons.find((sp) => sp.id === p.id) || null;
-              })
-              .filter(Boolean),
-          })),
-          pool: set.pool
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .map((p: any) => {
-              if (typeof p.id === 'string') {
-                return samplePokemons.find((sp) => sp.en_name === p.id) || null;
-              }
-              return samplePokemons.find((sp) => sp.id === p.id) || null;
-            })
-            .filter(Boolean),
-        }));
-        setSets(migrated);
-      } catch (e) {
-        console.error('Failed to load saved data:', e);
-      }
-    } else {
-      // 初期データ
-      const initialSet: Set = {
-        id: 'set_1',
-        items: [
-          { id: 'item_1', name: 'ターゲット', pokemons: [] },
-          { id: 'item_2', name: '有利', pokemons: [] },
-        ],
-        pool: [...samplePokemons],
-        isPoolOpen: false,
-      };
-      setSets([initialSet]);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (sets.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(sets));
-    }
-  }, [sets]);
 
   const handleAddSet = () => {
     const ts = Date.now();
@@ -404,9 +374,21 @@ function App() {
     setSets([...sets, newSet]);
   };
 
+  const { getShareUrl } = useSetsStorage();
+
+  const handleShare = () => {
+    const url = getShareUrl();
+    navigator.clipboard.writeText(url).then(() => {
+      alert('共有URLをクリップボードにコピーしました！');
+    }).catch(err => {
+      console.error('Failed to copy URL:', err);
+      alert('URLのコピーに失敗しました。');
+    });
+  };
+
   const handleReset = () => {
     if (window.confirm('すべてのデータを削除しますか？')) {
-      localStorage.removeItem(STORAGE_KEY);
+      clearStorage();
       setSets([]);
       setSelectedPokemon(null);
     }
@@ -936,6 +918,9 @@ function App() {
           >
             <button className={addButton} onClick={() => { handleAddSet(); setIsMenuOpen(false); }}>
               + セット追加
+            </button>
+            <button className={shareButton} onClick={() => { handleShare(); setIsMenuOpen(false); }}>
+              共有URLをコピー
             </button>
             <button className={resetButton} onClick={() => { handleReset(); setIsMenuOpen(false); }}>
               Reset
