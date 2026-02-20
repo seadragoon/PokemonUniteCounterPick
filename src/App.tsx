@@ -804,15 +804,15 @@ function App() {
   const handlePokemonClick = useCallback((setId: string, pokemon: Pokemon) => {
     // 既にポケモン選択中で、別のポケモンをクリックした場合
     if (selectedPokemon && selectedPokemon.pokemon.id !== pokemon.id) {
-      // 同一セットの場合は選択変更のみ
-      if (selectedPokemon.setId === setId) {
-        setSelectedPokemon({ setId, pokemon });
-        return;
-      }
-
       const set = sets.find(s => s.id === setId);
       if (set) {
+        const sourceItem = set.items.find(item => item.pokemons.some(p => p.id === selectedPokemon.pokemon.id));
         const targetItem = set.items.find(item => item.pokemons.some(p => p.id === pokemon.id));
+        if (sourceItem === targetItem) {
+          // 同一項目の場合は選択変更のみ
+          setSelectedPokemon({ setId, pokemon });
+          return;
+        }
 
         const isTargetPool = !targetItem && set.pool.some(p => p.id === pokemon.id);
 
