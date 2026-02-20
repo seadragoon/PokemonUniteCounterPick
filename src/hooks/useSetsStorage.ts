@@ -4,14 +4,15 @@ import { samplePokemons } from '../data/pokemon';
 
 const STORAGE_KEY = 'pokemon-unite-counter-pick';
 
-// 保存形式: pokemons を number[] (IDのみ) で保存、pool/isPoolOpen は保存しない
+// 項目のデフォルト名（インデックスで決まる）
+const DEFAULT_ITEM_NAMES: Record<number, string> = { 0: 'ターゲット', 1: '有利' };
+
+// 保存形式: IDなし（配列位置で識別）、デフォルト名の項目はname省略
 interface SavedSetItem {
-    id: string;
-    name: string;
+    name?: string;  // デフォルト名の場合は省略
     pokemons: number[];
 }
 interface SavedSet {
-    id: string;
     name?: string;
     items: SavedSetItem[];
 }
@@ -51,12 +52,18 @@ const computePool = (items: { pokemons: Pokemon[] }[]): Pokemon[] => {
     return samplePokemons.filter((p) => !usedIds.has(p.id));
 };
 
-/** localStorage / URL からセットデータを読み込み、RuntimeSetに変換する */
+/**
+ * localStorage / URL からセットデータを読み込み、RuntimeSetに変換する。
+ * 保存データにIDはないため、配列位置からユニークな実行時IDを生成する。
+ * 旧形式（IDあり）でも互換性あり：IDフィールドは無視される。
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const deserializeSets = (parsed: any[]): RuntimeSet[] => {
-    return parsed.map((set: any) => {
-        const items = (set.items || []).map((item: any) => ({
-            ...item,
+    return parsed.map((set: any, si: number) => {
+        const setId = `s${si}`;
+        const items = (set.items || []).map((item: any, ii: number) => ({
+            id: `${setId}_i${ii}`,
+            name: item.name || DEFAULT_ITEM_NAMES[ii] || '',
             pokemons: (item.pokemons || [])
                 .map((p: any) => resolvePokemonId(p))
                 .filter((id: number | null): id is number => id !== null)
@@ -64,7 +71,7 @@ const deserializeSets = (parsed: any[]): RuntimeSet[] => {
                 .filter(Boolean),
         }));
         return {
-            id: set.id,
+            id: setId,
             name: set.name,
             items,
             pool: computePool(items),
@@ -72,13 +79,13 @@ const deserializeSets = (parsed: any[]): RuntimeSet[] => {
     });
 };
 
-/** RuntimeSet を保存形式に変換する（pool/isPoolOpen は保存しない） */
+/** RuntimeSet を保存形式に変換する（IDなし、pool なし、デフォルト名は省略） */
 const serializeSets = (sets: RuntimeSet[]): SavedSet[] => {
     return sets.map((set) => ({
-        id: set.id,
         name: set.name,
-        items: set.items.map((item) => ({
-            ...item,
+        items: set.items.map((item, ii) => ({
+            // デフォルト名と一致する場合はnameを省略して保存データを削減
+            ...(item.name !== DEFAULT_ITEM_NAMES[ii] ? { name: item.name } : {}),
             pokemons: item.pokemons.map((p) => p.id),
         })),
     }));
