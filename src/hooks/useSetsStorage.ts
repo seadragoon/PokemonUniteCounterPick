@@ -100,6 +100,34 @@ const createInitialSet = (): RuntimeSet => ({
     pool: [...samplePokemons],
 });
 
+/** deflate-raw で圧縮 */
+const compressData = async (data: string): Promise<Uint8Array> => {
+    const stream = new Blob([data]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+};
+
+/** deflate-raw を解凍 */
+const decompressData = async (data: Uint8Array): Promise<string> => {
+    const ds = new DecompressionStream('deflate-raw');
+    const writer = ds.writable.getWriter();
+    writer.write(new Uint8Array(data));
+    writer.close();
+    return new Response(ds.readable).text();
+};
+
+/** Uint8Array → URL safe Base64 */
+const toBase64Url = (bytes: Uint8Array): string =>
+    btoa(Array.from(bytes, (b) => String.fromCharCode(b)).join(''))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+
+/** URL safe Base64 → Uint8Array */
+const fromBase64Url = (str: string): Uint8Array => {
+    const binary = atob(str.replace(/-/g, '+').replace(/_/g, '/'));
+    return Uint8Array.from(binary, (c) => c.charCodeAt(0));
+};
+
 export function useSetsStorage() {
     const [sets, setSets] = useState<RuntimeSet[]>([]);
     const loadedRef = useRef(false);
@@ -110,36 +138,46 @@ export function useSetsStorage() {
         if (loadedRef.current) return;
         loadedRef.current = true;
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlData = urlParams.get('d');
+        const loadFromUrl = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlData = urlParams.get('d');
+            if (!urlData) return false;
 
-        if (urlData) {
             try {
-                // Base64デコード (URL safe対応)
-                const binary = atob(urlData.replace(/-/g, '+').replace(/_/g, '/'));
-                const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
-                const parsed = JSON.parse(new TextDecoder().decode(bytes));
-                const deserialized = deserializeSets(parsed);
-                setSets(deserialized);
-                // URLから読み込んだ場合はクエリパラメータを消す（リロード対策）
+                const bytes = fromBase64Url(urlData);
+                // 圧縮データを解凍し、失敗時は旧形式（非圧縮JSON）にフォールバック
+                let jsonStr: string;
+                try {
+                    jsonStr = await decompressData(bytes);
+                } catch {
+                    jsonStr = new TextDecoder().decode(bytes);
+                }
+                const parsed = JSON.parse(jsonStr);
+                setSets(deserializeSets(parsed));
                 window.history.replaceState({}, '', window.location.pathname);
-                return;
+                return true;
             } catch (e) {
                 console.error('Failed to parse URL data:', e);
+                return false;
             }
-        }
+        };
 
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                setSets(deserializeSets(parsed));
-            } catch (e) {
-                console.error('Failed to load saved data:', e);
+        const loadFromStorage = () => {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    setSets(deserializeSets(JSON.parse(saved)));
+                } catch (e) {
+                    console.error('Failed to load saved data:', e);
+                }
+            } else {
+                setSets([createInitialSet()]);
             }
-        } else {
-            setSets([createInitialSet()]);
-        }
+        };
+
+        loadFromUrl().then((loaded) => {
+            if (!loaded) loadFromStorage();
+        });
     }, []);
 
     // 保存
@@ -153,16 +191,10 @@ export function useSetsStorage() {
         localStorage.removeItem(STORAGE_KEY);
     };
 
-    const getShareUrl = () => {
-        const serialized = serializeSets(sets);
-        const json = JSON.stringify(serialized);
-        // Base64エンコード (Unicode対応 + URL safe)
-        const bytes = new TextEncoder().encode(json);
-        const binary = Array.from(bytes, (b) => String.fromCharCode(b)).join('');
-        const encoded = btoa(binary)
-            .replace(/\+/g, '-')
-            .replace(/\//g, '_')
-            .replace(/=+$/, '');
+    const getShareUrl = async (): Promise<string> => {
+        const json = JSON.stringify(serializeSets(sets));
+        const compressed = await compressData(json);
+        const encoded = toBase64Url(compressed);
 
         const url = new URL(window.location.href);
         url.searchParams.set('d', encoded);

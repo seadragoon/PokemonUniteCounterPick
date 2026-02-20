@@ -375,14 +375,15 @@ function App() {
 
   const { getShareUrl } = useSetsStorage();
 
-  const handleShare = () => {
-    const url = getShareUrl();
-    navigator.clipboard.writeText(url).then(() => {
+  const handleShare = async () => {
+    try {
+      const url = await getShareUrl();
+      await navigator.clipboard.writeText(url);
       alert('共有URLをクリップボードにコピーしました！');
-    }).catch(err => {
+    } catch (err) {
       console.error('Failed to copy URL:', err);
       alert('URLのコピーに失敗しました。');
-    });
+    }
   };
 
   const handleReset = () => {
