@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { css } from '@linaria/core';
+import { Size } from '../constants/cssSize';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import type { SetItem, Pokemon } from '../types';
 import { SortablePokemon } from './SortablePokemon';
@@ -25,10 +26,10 @@ interface SetItemComponentProps {
 
 const itemContainer = css`
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
+  border-radius: ${Size(8)};
   overflow: hidden;
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: ${Size(1)} solid rgba(102, 126, 234, 0.3);
+  box-shadow: 0 ${Size(2)} ${Size(8)} rgba(0, 0, 0, 0.1);
   flex: 1;
   display: flex;
   flex-direction: row;
@@ -44,28 +45,28 @@ const itemHeader = css`
   display: flex;
   align-items: center;
   margin-bottom: 0;
-  padding: 8px 12px;
+  padding: ${Size(8)} ${Size(12)};
   background: rgba(102, 126, 234, 0.1);
   border-bottom: none;
-  border-right: 1px solid rgba(102, 126, 234, 0.3);
-  width: 160px;
+  border-right: ${Size(1)} solid rgba(102, 126, 234, 0.3);
+  width: ${Size(160)};
   flex-shrink: 0;
 
   @media (max-width: 820px) {
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+    border-bottom: ${Size(1)} solid rgba(102, 126, 234, 0.3);
     justify-content: center; /* タイトル入力欄を中央寄せ */
   }
 `;
 
 const itemNameInput = css`
   width: 100%;
-  font-size: 1rem;
+  font-size: ${Size(16)};
   font-weight: 700;
-  padding: 4px 8px;
-  border: 1px solid transparent;
-  border-radius: 4px;
+  padding: ${Size(4)} ${Size(8)};
+  border: ${Size(1)} solid transparent;
+  border-radius: ${Size(4)};
   background: transparent;
   cursor: text;
   transition: all 0.2s;
@@ -87,31 +88,31 @@ const pokemonsContainer = css`
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
-  gap: 4px;
-  min-height: 40px;
-  padding: 10px;
+  gap: ${Size(4)};
+  min-height: ${Size(40)};
+  padding: ${Size(10)};
   background: rgba(255, 255, 255, 0.5);
   transition: all 0.2s;
   flex: 1;
-  padding-right: 10px;
+  padding-right: ${Size(10)};
 `;
 
 const pokemonsContainerClickable = css`
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
-  gap: 4px;
-  min-height: 40px;
-  padding: 10px;
+  gap: ${Size(4)};
+  min-height: ${Size(40)};
+  padding: ${Size(10)};
   background: rgba(255, 255, 255, 0.5);
   transition: all 0.2s;
   flex: 1;
-  padding-right: 10px;
+  padding-right: ${Size(10)};
   cursor: pointer;
 
   &:hover {
     background: rgba(102, 126, 234, 0.1);
-    box-shadow: inset 0 0 0 2px #667eea;
+    box-shadow: inset 0 0 0 ${Size(2)} #667eea;
   }
 `;
 
@@ -119,49 +120,49 @@ const pokemonsContainerDroppable = css`
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
-  gap: 4px;
-  min-height: 40px;
-  padding: 10px;
+  gap: ${Size(4)};
+  min-height: ${Size(40)};
+  padding: ${Size(10)};
   background: rgba(255, 255, 255, 0.5);
   transition: all 0.2s;
   flex: 1;
   background: rgba(102, 126, 234, 0.15);
-  box-shadow: inset 0 0 0 2px #667eea;
-  padding-right: 10px;
+  box-shadow: inset 0 0 0 ${Size(2)} #667eea;
+  padding-right: ${Size(10)};
 `;
 
 const emptyMessage = css`
   color: #888;
-  font-size: 0.85rem;
+  font-size: ${Size(14)};
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
-  min-height: 40px;
+  min-height: ${Size(40)};
 `;
 
 const controlsContainer = css`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 0 12px;
+  gap: ${Size(8)};
+  padding: 0 ${Size(12)};
   background: rgba(102, 126, 234, 0.05);
-  border-left: 1px solid rgba(102, 126, 234, 0.2);
+  border-left: ${Size(1)} solid rgba(102, 126, 234, 0.2);
   flex-shrink: 0;
 `;
 
 const moveButtonsColumn = css`
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: ${Size(4)};
 `;
 
 const controlButton = css`
-  width: 32px;
-  height: 32px;
-  font-size: 1.2rem;
+  width: ${Size(32)};
+  height: ${Size(32)};
+  font-size: ${Size(19)};
   border: none;
   background: transparent;
   cursor: pointer;
@@ -169,7 +170,7 @@ const controlButton = css`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: ${Size(4)};
   transition: all 0.2s;
 
   &:hover:not(:disabled) {
@@ -184,9 +185,9 @@ const controlButton = css`
 `;
 
 const moveButton = css`
-  width: 32px;
-  height: 24px; /* Slightly shorter for stacking */
-  font-size: 1rem;
+  width: ${Size(32)};
+  height: ${Size(24)}; /* Slightly shorter for stacking */
+  font-size: ${Size(16)};
   border: none;
   background: transparent;
   cursor: pointer;
@@ -194,7 +195,7 @@ const moveButton = css`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: ${Size(4)};
   transition: all 0.2s;
   line-height: 1;
 

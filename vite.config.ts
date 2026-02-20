@@ -8,6 +8,9 @@ export default defineConfig({
     react(),
     wyw({
       include: ['**/*.{ts,tsx}'],
+      babelOptions: {
+        presets: ['@babel/preset-typescript'],
+      },
     }),
   ],
   base: './',

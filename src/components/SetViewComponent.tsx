@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { css } from '@linaria/core';
+import { Size } from '../constants/cssSize';
 import type { RuntimeSet } from '../types';
 import { PokemonImage } from './PokemonImage';
 
@@ -10,27 +11,27 @@ interface SetViewComponentProps {
 
 const setContainer = css`
   background: rgba(255, 255, 255, 0.98);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(10px);
-  margin-bottom: 20px;
+  border-radius: ${Size(16)};
+  padding: ${Size(20)};
+  box-shadow: 0 ${Size(4)} ${Size(12)} rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(${Size(10)});
+  margin-bottom: ${Size(20)};
   break-inside: avoid;
   width: 100%;
   box-sizing: border-box;
 `;
 
 const setTitle = css`
-  font-size: 1.2rem;
+  font-size: ${Size(19)};
   font-weight: bold;
   color: #333;
-  margin: 0 0 15px 0;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #eee;
+  margin: 0 0 ${Size(15)} 0;
+  padding-bottom: ${Size(10)};
+  border-bottom: ${Size(2)} solid #eee;
 `;
 
 const itemContainer = css`
-  margin-bottom: 20px;
+  margin-bottom: ${Size(20)};
   
   &:last-child {
     margin-bottom: 0;
@@ -38,27 +39,27 @@ const itemContainer = css`
 `;
 
 const itemName = css`
-  font-size: 0.95rem;
+  font-size: ${Size(15)};
   font-weight: 700;
   color: #666;
-  margin-bottom: 8px;
-  padding-left: 4px;
+  margin-bottom: ${Size(8)};
+  padding-left: ${Size(4)};
   display: block;
 `;
 
 const pokemonList = css`
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: ${Size(8)};
   background: rgba(102, 126, 234, 0.05);
-  padding: 10px;
-  border-radius: 8px;
+  padding: ${Size(10)};
+  border-radius: ${Size(8)};
 `;
 
 const emptyMessage = css`
   color: #999;
-  font-size: 0.85rem;
-  padding: 5px;
+  font-size: ${Size(14)};
+  padding: ${Size(5)};
   font-style: italic;
 `;
 

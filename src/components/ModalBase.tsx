@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { css } from '@linaria/core';
+import { Size } from '../constants/cssSize';
 
 interface ModalBaseProps {
   isOpen: boolean;
@@ -19,7 +20,7 @@ const overlay = css`
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(${Size(4)});
   animation: fadeIn 0.2s ease-out;
 
   @keyframes fadeIn {
@@ -30,24 +31,24 @@ const overlay = css`
 
 const modalContainer = css`
   background: white;
-  border-radius: 12px;
+  border-radius: ${Size(12)};
   width: 90%;
-  max-width: 500px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: ${Size(500)};
+  box-shadow: 0 ${Size(10)} ${Size(25)} rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 
   @keyframes slideUp {
-    from { transform: translateY(20px); opacity: 0; }
+    from { transform: translateY(${Size(20)}); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
   }
 `;
 
 const header = css`
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
+  padding: ${Size(15)} ${Size(20)};
+  border-bottom: ${Size(1)} solid #eee;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -55,7 +56,7 @@ const header = css`
 
 const titleStyle = css`
   margin: 0;
-  font-size: 1.25rem;
+  font-size: ${Size(20)};
   font-weight: 600;
   color: #333;
 `;
@@ -64,7 +65,7 @@ const closeButton = css`
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.5rem;
+  font-size: ${Size(24)};
   color: #999;
   padding: 0;
   line-height: 1;
@@ -76,7 +77,7 @@ const closeButton = css`
 `;
 
 const content = css`
-  padding: 20px;
+  padding: ${Size(20)};
 `;
 
 import { createPortal } from 'react-dom';

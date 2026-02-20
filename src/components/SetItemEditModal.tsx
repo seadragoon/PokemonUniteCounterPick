@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { css } from '@linaria/core';
+import { Size } from '../constants/cssSize';
 import { ModalBase } from './ModalBase';
 
 interface SetItemEditModalProps {
@@ -13,49 +14,49 @@ interface SetItemEditModalProps {
 }
 
 const section = css`
-  margin-bottom: 24px;
+  margin-bottom: ${Size(24)};
   
   &:last-child {
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
 `;
 
 const label = css`
   display: block;
-  font-size: 0.9rem;
+  font-size: ${Size(14)};
   font-weight: 600;
   color: #666;
-  margin-bottom: 8px;
+  margin-bottom: ${Size(8)};
 `;
 
 const input = css`
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: ${Size(10)};
+  border: ${Size(1)} solid #ddd;
+  border-radius: ${Size(8)};
+  font-size: ${Size(16)};
   transition: border-color 0.2s;
   box-sizing: border-box;
 
   &:focus {
     outline: none;
     border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 ${Size(3)} rgba(102, 126, 234, 0.1);
   }
 `;
 
 const deleteButton = css`
   width: 100%;
-  padding: 10px;
+  padding: ${Size(10)};
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: ${Size(8)};
+  font-size: ${Size(16)};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   background-color: #ffcdd2; /* Increased visibility */
   color: #c62828; /* Darker text for contrast */
-  margin-top: 8px;
+  margin-top: ${Size(8)};
 
   &:hover:not(:disabled) {
     background-color: #ef9a9a;
@@ -71,17 +72,17 @@ const deleteButton = css`
 
 const addButton = css`
   width: 100%;
-  padding: 10px;
+  padding: ${Size(10)};
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: ${Size(8)};
+  font-size: ${Size(16)};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   background-color: #c8e6c9; /* Increased visibility */
   color: #2e7d32;
-  margin-top: 8px;
-  min-width: 60px;
+  margin-top: ${Size(8)};
+  min-width: ${Size(60)};
 
   &:hover {
     background-color: #a5d6a7;

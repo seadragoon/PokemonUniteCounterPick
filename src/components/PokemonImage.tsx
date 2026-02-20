@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { css } from '@linaria/core';
+import { Size } from '../constants/cssSize';
 import { type Pokemon, Role } from '../types';
 
 interface PokemonImageProps {
@@ -28,39 +29,39 @@ const getRoleColor = (role: Role): string => {
 
 const imageContainer = css`
   position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: ${Size(40)};
+  height: ${Size(40)};
+  border-radius: ${Size(10)};
   overflow: hidden;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 ${Size(2)} ${Size(4)} rgba(0, 0, 0, 0.2);
 
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 ${Size(4)} ${Size(8)} rgba(0, 0, 0, 0.3);
   }
 `;
 
 const imageContainerDragging = css`
   position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: ${Size(40)};
+  height: ${Size(40)};
+  border-radius: ${Size(10)};
   overflow: hidden;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 ${Size(2)} ${Size(4)} rgba(0, 0, 0, 0.2);
 
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 ${Size(4)} ${Size(8)} rgba(0, 0, 0, 0.3);
   }
 
   opacity: 0.5;
@@ -69,9 +70,9 @@ const imageContainerDragging = css`
 
 const imageContainerSelected = css`
   position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: ${Size(40)};
+  height: ${Size(40)};
+  border-radius: ${Size(10)};
   overflow: hidden;
   cursor: pointer;
   transition: all 0.2s;
@@ -79,20 +80,20 @@ const imageContainerSelected = css`
   align-items: center;
   justify-content: center;
   
-  border: 3px solid #2196f3;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3), 0 4px 8px rgba(0, 0, 0, 0.3);
+  border: ${Size(3)} solid #2196f3;
+  box-shadow: 0 0 0 ${Size(3)} rgba(33, 150, 243, 0.3), 0 ${Size(4)} ${Size(8)} rgba(0, 0, 0, 0.3);
   
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3), 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 0 ${Size(3)} rgba(33, 150, 243, 0.3), 0 ${Size(4)} ${Size(8)} rgba(0, 0, 0, 0.3);
   }
   
   @keyframes pulse {
     0%, 100% {
-      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3), 0 4px 8px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 0 ${Size(3)} rgba(33, 150, 243, 0.3), 0 ${Size(4)} ${Size(8)} rgba(0, 0, 0, 0.3);
     }
     50% {
-      box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 0 ${Size(6)} rgba(33, 150, 243, 0.5), 0 ${Size(4)} ${Size(8)} rgba(0, 0, 0, 0.3);
     }
   }
   
@@ -105,7 +106,7 @@ const image = css`
   width: 95%;
   height: 95%;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: ${Size(12)};
 `;
 
 const background = css`
@@ -114,7 +115,7 @@ const background = css`
   left: 0;
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: ${Size(12)};
   z-index: 0; /* 明示的に低くする */
 `;
 

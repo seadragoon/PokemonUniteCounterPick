@@ -1,7 +1,7 @@
-// 定数定義ファイル
+// cssSize.ts から純粋関数を re-export（Linaria の css テンプレート内でも使用可能）
+export { Size, VariableSize } from './cssSize';
 
-
-// rem単位をpx単位に変換する
+// rem単位をpx単位に変換する（ブラウザAPI依存）
 const convertRemToPx = (rem: number): number => {
   let fontSize: string = "16";
   if (typeof getComputedStyle === "function") {
@@ -16,20 +16,6 @@ const PixelToRem = (px: number): number => {
 };
 
 /**
- * px値からremに変換してrem指定文字列として返却
- *
- * NOTE:
- *  CSS (Emotion) 上で長さを指定するときはこの関数を使い、px などの絶対単位は使用しないでください。
- *  可変サイズ指定したい場合にはVariableSize()関数の使用もできます。
- *
- * @param pixel px値
- * @returns rem指定文字列
- */
-export const Size = (px: number): string => {
-  return `${PixelToRem(px)}rem`;
-};
-
-/**
  * 実際のpx値を参照（大元がサイズ変更されているかを確認する）
  * ※ どうしてもpx値を参照しないといけない場合に使用（framer-motionの移動値の指定はpx単位）
  *
@@ -38,18 +24,6 @@ export const Size = (px: number): string => {
  */
 export const ActualPx = (px: number): number => {
   return convertRemToPx(PixelToRem(px));
-};
-
-/**
- * ピクセル指定した可変サイズのrem
- * @param minPx 最小px値
- * @param maxPx 最大px値
- * @returns rem指定文字列
- */
-export const VariableSize = (minPx: number, maxPx: number, minWidth: number, maxWidth: number): string => {
-  const min = Size(minPx);
-  const max = Size(maxPx);
-  return `clamp(${min}, calc(${min} + ${maxPx - minPx} * ((100vw - ${Size(minWidth)}) / ${maxWidth - minWidth})), ${max})`;
 };
 
 /**
@@ -91,7 +65,7 @@ export const formatDateToJapanese = (date: Date): string => {
 
   const month = date.getMonth() + 1;
   const day = date.getDate();
-  const weekday = new Intl.DateTimeFormat("ja-JP", {weekday: "short"}).format(date);
+  const weekday = new Intl.DateTimeFormat("ja-JP", { weekday: "short" }).format(date);
 
   return `${formattedYear}${month}月${day}日（${weekday}）`;
 };

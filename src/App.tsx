@@ -18,11 +18,12 @@ import { SetComponent } from './components/SetComponent';
 import { SetViewComponent } from './components/SetViewComponent';
 import { PokemonImage } from './components/PokemonImage';
 import { useSetsStorage, isSetSaveable } from './hooks/useSetsStorage';
+import { VariableSize, Size } from './constants/cssSize';
 
 const appContainer = css`
   min-height: 100vh;
-  padding: 20px;
-  padding-top: 70px; /* JSで動的に上書き */
+  padding: ${Size(20)};
+  padding-top: ${Size(70)}; /* JSで動的に上書き */
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -31,11 +32,11 @@ const appContainer = css`
 `;
 
 const viewModeContainer = css`
-  max-width: 1400px;
+  max-width: ${Size(1400)};
   margin: 0 auto;
   column-count: 1;
-  column-gap: 20px;
-  padding: 0 10px;
+  column-gap: ${Size(20)};
+  padding: 0 ${Size(10)};
 
   @media (min-width: 820px) {
     column-count: 2;
@@ -50,18 +51,19 @@ const viewModeContainer = css`
 const toggleButtonGroup = css`
   display: flex;
   background: rgba(255, 255, 255, 0.2);
-  padding: 4px;
-  border-radius: 8px;
-  gap: 4px;
+  padding: ${Size(4)};
+  border-radius: ${Size(8)};
+  gap: ${Size(4)};
 `;
 
 
 const toggleButton = css`
-  padding: 8px 16px;
+  padding: ${Size(8)} ${Size(16)};
   border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  border-radius: ${Size(6)};
+  font-size: ${VariableSize(12, 16, 820, 1020)};
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s;
   background: transparent;
@@ -78,7 +80,7 @@ const toggleButton = css`
 const activeToggleButton = css`
   background: white;
   color: #667eea;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 ${Size(2)} ${Size(4)} rgba(0, 0, 0, 0.1);
 
   &:hover {
     background: white;
@@ -92,16 +94,16 @@ const header = css`
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: 10px 24px;
+  padding: ${Size(10)} ${Size(24)};
   display: flex;
   flex-direction: column;
   gap: 0;
   background: rgba(102, 126, 234, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(${Size(10)});
+  box-shadow: 0 ${Size(4)} ${Size(12)} rgba(0, 0, 0, 0.15);
 
   @media (max-width: 820px) {
-    padding: 8px 12px;
+    padding: ${Size(8)} ${Size(12)};
   }
 `;
 
@@ -110,13 +112,13 @@ const headerRow1 = css`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  gap: 12px;
+  gap: ${Size(12)};
 `;
 
 const headerRow1Right = css`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: ${Size(10)};
 
   @media (max-width: 820px) {
     display: none;
@@ -128,7 +130,7 @@ const headerRow2 = css`
   justify-content: flex-end;
   align-items: center;
   width: 100%;
-  gap: 10px;
+  gap: ${Size(10)};
   max-height: 0;
   opacity: 0;
   overflow: hidden;
@@ -136,9 +138,9 @@ const headerRow2 = css`
   padding-top: 0;
 
   &.open {
-    max-height: 60px;
+    max-height: ${Size(60)};
     opacity: 1;
-    padding-top: 8px;
+    padding-top: ${Size(8)};
   }
 
   @media (max-width: 820px) {
@@ -151,9 +153,9 @@ const row2ToggleButton = css`
   border: none;
   color: white;
   cursor: pointer;
-  padding: 6px 8px;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  padding: ${Size(6)} ${Size(8)};
+  border-radius: ${Size(6)};
+  font-size: ${Size(13)};
   display: flex;
   align-items: center;
   transition: all 0.2s;
@@ -169,15 +171,14 @@ const row2ToggleButton = css`
 
 const title = css`
   color: white;
-  /* 820px→1.4rem, 920px→2rem に滑らかに変化 */
-  font-size: clamp(1.4rem, calc(1.4rem + (2 - 1.4) * ((100vw - 820px) / (920 - 820))), 2rem);
+  font-size: ${VariableSize(22, 32, 820, 1020)};
   font-weight: bold;
   margin: 0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: ${Size(2)} ${Size(2)} ${Size(4)} rgba(0, 0, 0, 0.3);
   white-space: nowrap;
 
   @media (max-width: 820px) {
-    font-size: 1.4rem;
+    font-size: ${Size(22)};
   }
 `;
 
@@ -186,18 +187,18 @@ const hamburgerButton = css`
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 10px;
+  padding: ${Size(10)};
   flex-direction: column;
   justify-content: space-around;
-  width: 40px;
-  height: 40px;
+  width: ${Size(40)};
+  height: ${Size(40)};
   
   span {
     display: block;
-    width: 24px;
-    height: 3px;
+    width: ${Size(24)};
+    height: ${Size(3)};
     background-color: white;
-    border-radius: 2px;
+    border-radius: ${Size(2)};
     transition: all 0.3s;
   }
 
@@ -208,7 +209,7 @@ const hamburgerButton = css`
 
 const mobileMenu = css`
   display: none;
-  gap: 10px;
+  gap: ${Size(10)};
   align-items: center;
 
   @media (max-width: 820px) {
@@ -224,15 +225,15 @@ const mobileMenu = css`
     
     margin-top: 0;
     padding-top: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0); 
+    border-top: ${Size(1)} solid rgba(255, 255, 255, 0); 
     align-items: stretch;
     
     &.open {
-      max-height: 500px;
+      max-height: ${Size(500)};
       opacity: 1;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      margin-top: ${Size(10)};
+      padding-top: ${Size(10)};
+      border-top: ${Size(1)} solid rgba(255, 255, 255, 0.2);
     }
   }
 `;
@@ -262,7 +263,7 @@ const menuOverlay = css`
 
 const buttonGroup = css`
   display: flex;
-  gap: 10px;
+  gap: ${Size(10)};
   flex-wrap: wrap;
 
   @media (max-width: 820px) {
@@ -283,18 +284,18 @@ const buttonGroup = css`
 
 
 const addButton = css`
-  padding: 10px 20px;
+  padding: ${Size(10)} ${Size(20)};
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: ${Size(8)};
+  font-size: ${Size(16)};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 ${Size(2)} ${Size(4)} rgba(0, 0, 0, 0.2);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(${Size(-2)});
+    box-shadow: 0 ${Size(4)} ${Size(8)} rgba(0, 0, 0, 0.3);
   }
 
   &:active {
@@ -306,24 +307,24 @@ const addButton = css`
 
   &:hover {
     background: #45a049;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(${Size(-2)});
+    box-shadow: 0 ${Size(4)} ${Size(8)} rgba(0, 0, 0, 0.3);
   }
 `;
 
 const resetButton = css`
-  padding: 10px 20px;
+  padding: ${Size(10)} ${Size(20)};
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: ${Size(8)};
+  font-size: ${Size(16)};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 ${Size(2)} ${Size(4)} rgba(0, 0, 0, 0.2);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(${Size(-2)});
+    box-shadow: 0 ${Size(4)} ${Size(8)} rgba(0, 0, 0, 0.3);
   }
 
   &:active {
@@ -335,24 +336,25 @@ const resetButton = css`
 
   &:hover {
     background: #da190b;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(${Size(-2)});
+    box-shadow: 0 ${Size(4)} ${Size(8)} rgba(0, 0, 0, 0.3);
   }
 `;
 
 const shareButton = css`
-  padding: 10px 20px;
+  padding: ${Size(10)} ${Size(20)};
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: ${Size(8)};
+  font-size: ${VariableSize(12, 16, 820, 1020)};
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 ${Size(2)} ${Size(4)} rgba(0, 0, 0, 0.2);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(${Size(-2)});
+    box-shadow: 0 ${Size(4)} ${Size(8)} rgba(0, 0, 0, 0.3);
   }
 
   &:active {
@@ -382,46 +384,46 @@ const shareButton = css`
 `;
 
 const setsContainer = css`
-  max-width: 1200px;
+  max-width: ${Size(1200)};
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: ${Size(20)};
 `;
 
 const emptyState = css`
   text-align: center;
   color: white;
-  padding: 40px;
+  padding: ${Size(40)};
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
+  border-radius: ${Size(12)};
+  backdrop-filter: blur(${Size(10)});
   column-span: all;
 `;
 
 const footerStyle = css`
-  max-width: 1200px;
-  margin: 40px auto 0;
-  padding: 0 20px 20px;
+  max-width: ${Size(1200)};
+  margin: ${Size(40)} auto 0;
+  padding: 0 ${Size(20)} ${Size(20)};
   text-align: center;
 `;
 
 const footerDivider = css`
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
-  margin-bottom: 16px;
+  border-top: ${Size(1)} solid rgba(255, 255, 255, 0.3);
+  margin-bottom: ${Size(16)};
 `;
 
 const footerDisclaimer = css`
   color: rgba(255, 255, 255, 0.7);
-  font-size: 0.75rem;
+  font-size: ${Size(12)};
   line-height: 1.6;
-  margin: 0 0 8px;
+  margin: 0 0 ${Size(8)};
 `;
 
 const footerCopyright = css`
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.75rem;
+  font-size: ${Size(12)};
   margin: 0;
 `;
 

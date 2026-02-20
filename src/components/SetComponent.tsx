@@ -1,5 +1,6 @@
 import { memo, useState } from 'react';
 import { css } from '@linaria/core';
+import { Size } from '../constants/cssSize';
 import type { RuntimeSet, Pokemon } from '../types';
 import { SetItemComponent } from './SetItemComponent';
 import { SortablePokemon } from './SortablePokemon';
@@ -26,42 +27,42 @@ interface SetComponentProps {
 
 const setContainer = css`
   background: rgba(255, 255, 255, 0.98);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(10px);
+  border-radius: ${Size(16)};
+  padding: ${Size(20)};
+  box-shadow: 0 ${Size(4)} ${Size(12)} rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(${Size(10)});
 `;
 
 const setHeader = css`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  gap: 15px;
+  margin-bottom: ${Size(20)};
+  gap: ${Size(15)};
 `;
 
 const setTitleSection = css`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: ${Size(10)};
 `;
 
 const setControls = css`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: ${Size(8)};
 `;
 
 const arrowButtons = css`
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: ${Size(2)};
 `;
 
 const arrowButton = css`
-  width: 32px;
-  height: 24px;
-  font-size: 1rem;
+  width: ${Size(32)};
+  height: ${Size(24)};
+  font-size: ${Size(16)};
   border: none;
   background: transparent;
   cursor: pointer;
@@ -69,7 +70,7 @@ const arrowButton = css`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: ${Size(4)};
   transition: all 0.2s;
   line-height: 1;
 
@@ -85,8 +86,8 @@ const arrowButton = css`
 `;
 
 const editButton = css`
-  width: 20px;
-  height: 20px;
+  width: ${Size(20)};
+  height: ${Size(20)};
   padding: 0;
   border: none;
   background: transparent;
@@ -95,10 +96,10 @@ const editButton = css`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: ${Size(4)};
   transition: all 0.2s;
-  font-size: 0.85rem;
-  margin-left: 6px;
+  font-size: ${Size(14)};
+  margin-left: ${Size(6)};
   opacity: 0.6;
 
   &:hover {
@@ -112,18 +113,18 @@ const editButton = css`
 `;
 
 const deleteButton = css`
-  padding: 8px 16px;
+  padding: ${Size(8)} ${Size(16)};
   border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  border-radius: ${Size(6)};
+  font-size: ${Size(14)};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 ${Size(2)} ${Size(4)} rgba(0, 0, 0, 0.2);
 
   &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transform: translateY(${Size(-1)});
+    box-shadow: 0 ${Size(4)} ${Size(6)} rgba(0, 0, 0, 0.3);
   }
 
   &:active {
@@ -141,58 +142,58 @@ const deleteButton = css`
 
   &:hover {
     background: #da190b;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transform: translateY(${Size(-1)});
+    box-shadow: 0 ${Size(4)} ${Size(6)} rgba(0, 0, 0, 0.3);
   }
 `;
 
 const poolToggle = css`
   margin: 0;
-  padding: 12px 20px;
+  padding: ${Size(12)} ${Size(20)};
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: ${Size(8)};
+  font-size: ${Size(16)};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 ${Size(2)} ${Size(4)} rgba(0, 0, 0, 0.2);
   width: 100%;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(${Size(-2)});
+    box-shadow: 0 ${Size(4)} ${Size(8)} rgba(0, 0, 0, 0.3);
   }
 `;
 
 const poolContainerOpen = css`
-  padding: 15px;
+  padding: ${Size(15)};
   background: rgba(0, 0, 0, 0.02);
-  border-radius: 12px;
+  border-radius: ${Size(12)};
   transition: all 0.3s;
   overflow: hidden;
-  max-height: 1000px;
+  max-height: ${Size(1000)};
 `;
 
 const poolContainerClosed = css`
-  padding: 15px;
+  padding: ${Size(15)};
   background: rgba(0, 0, 0, 0.02);
-  border-radius: 12px;
+  border-radius: ${Size(12)};
   transition: all 0.3s;
   overflow: hidden;
   max-height: 0;
-  padding: 0 15px;
+  padding: 0 ${Size(15)};
   margin: 0;
 `;
 
 const poolGrid = css`
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  padding: 10px;
-  min-height: 80px;
-  border-radius: 8px;
+  gap: ${Size(4)};
+  padding: ${Size(10)};
+  min-height: ${Size(80)};
+  border-radius: ${Size(8)};
   background: rgba(0, 0, 0, 0.02);
   transition: all 0.2s;
 `;
@@ -200,48 +201,48 @@ const poolGrid = css`
 const poolGridDroppable = css`
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  padding: 10px;
-  min-height: 80px;
-  border-radius: 8px;
+  gap: ${Size(4)};
+  padding: ${Size(10)};
+  min-height: ${Size(80)};
+  border-radius: ${Size(8)};
   transition: all 0.2s;
   
   background: rgba(102, 126, 234, 0.1);
-  border: 2px dashed #667eea;
+  border: ${Size(2)} dashed #667eea;
 `;
 
 const poolGridClickable = css`
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  padding: 10px;
-  min-height: 80px;
-  border-radius: 8px;
+  gap: ${Size(4)};
+  padding: ${Size(10)};
+  min-height: ${Size(80)};
+  border-radius: ${Size(8)};
   background: rgba(0, 0, 0, 0.02);
   transition: all 0.2s;
   cursor: pointer;
   
   &:hover {
     background: rgba(102, 126, 234, 0.1);
-    box-shadow: 0 0 0 2px #667eea;
+    box-shadow: 0 0 0 ${Size(2)} #667eea;
   }
 `;
 
 const emptyPoolMessage = css`
   color: #999;
-  font-size: 0.9rem;
+  font-size: ${Size(14)};
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 60px;
+  min-height: ${Size(60)};
 `;
 
 const itemsWrapper = css`
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  margin-bottom: 20px;
+  gap: ${Size(15)};
+  margin-bottom: ${Size(20)};
   width: 100%;
 `;
 
