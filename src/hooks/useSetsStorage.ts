@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { RuntimeSet, Pokemon } from '../types';
 import { samplePokemons } from '../data/pokemon';
 
@@ -102,17 +102,23 @@ const createInitialSet = (): RuntimeSet => ({
 
 export function useSetsStorage() {
     const [sets, setSets] = useState<RuntimeSet[]>([]);
+    const loadedRef = useRef(false);
 
     // URLからの読み込みを優先、次いで localStorage
+    // ※ StrictMode対策: replaceStateでURLパラメータを消すため、2回目の実行でURLデータが失われる問題を防ぐ
     useEffect(() => {
+        if (loadedRef.current) return;
+        loadedRef.current = true;
+
         const urlParams = new URLSearchParams(window.location.search);
         const urlData = urlParams.get('d');
 
         if (urlData) {
             try {
                 // Base64デコード (URL safe対応)
-                const decoded = atob(urlData.replace(/-/g, '+').replace(/_/g, '/'));
-                const parsed = JSON.parse(decodeURIComponent(escape(decoded)));
+                const binary = atob(urlData.replace(/-/g, '+').replace(/_/g, '/'));
+                const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+                const parsed = JSON.parse(new TextDecoder().decode(bytes));
                 const deserialized = deserializeSets(parsed);
                 setSets(deserialized);
                 // URLから読み込んだ場合はクエリパラメータを消す（リロード対策）
@@ -151,7 +157,9 @@ export function useSetsStorage() {
         const serialized = serializeSets(sets);
         const json = JSON.stringify(serialized);
         // Base64エンコード (Unicode対応 + URL safe)
-        const encoded = btoa(unescape(encodeURIComponent(json)))
+        const bytes = new TextEncoder().encode(json);
+        const binary = Array.from(bytes, (b) => String.fromCharCode(b)).join('');
+        const encoded = btoa(binary)
             .replace(/\+/g, '-')
             .replace(/\//g, '_')
             .replace(/=+$/, '');
