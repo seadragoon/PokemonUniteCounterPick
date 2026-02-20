@@ -12,7 +12,7 @@ import {
   pointerWithin,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import type { Set, Pokemon } from './types';
+import type { RuntimeSet, Pokemon } from './types';
 import { samplePokemons } from './data/pokemon';
 import { SetComponent } from './components/SetComponent';
 import { SetViewComponent } from './components/SetViewComponent';
@@ -362,14 +362,13 @@ function App() {
 
   const handleAddSet = () => {
     const ts = Date.now();
-    const newSet: Set = {
+    const newSet: RuntimeSet = {
       id: `set_${ts}`,
       items: [
         { id: `item_${ts}_1`, name: 'ターゲット', pokemons: [] },
         { id: `item_${ts}_2`, name: '有利', pokemons: [] },
       ],
       pool: [...samplePokemons],
-      isPoolOpen: false,
     };
     setSets([...sets, newSet]);
   };
@@ -681,7 +680,7 @@ function App() {
     }
   }, []);
 
-  const handleSetUpdate = useCallback((setId: string, updatedSet: Set) => {
+  const handleSetUpdate = useCallback((setId: string, updatedSet: RuntimeSet) => {
     setSets((prevSets) => prevSets.map((s) => (s.id === setId ? updatedSet : s)));
   }, []);
 

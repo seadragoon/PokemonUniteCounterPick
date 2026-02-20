@@ -22,10 +22,14 @@ export interface SetItem {
   pokemons: Pokemon[];
 }
 
+/** 保存対象データ（localStorageやURL共有で使う） */
 export interface Set {
   id: string;
   name?: string;
   items: SetItem[];
+}
+
+/** 実行時データ（保存データ + 算出されるpool） */
+export interface RuntimeSet extends Set {
   pool: Pokemon[];
-  isPoolOpen: boolean;
 }

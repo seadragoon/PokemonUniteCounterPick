@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import type { Set, Pokemon } from '../types';
+import type { RuntimeSet, Pokemon } from '../types';
 import { samplePokemons } from '../data/pokemon';
 
 const STORAGE_KEY = 'pokemon-unite-counter-pick';
 
-// 保存形式: pokemons/pool を number[] (IDのみ) で保存
+// 保存形式: pokemons を number[] (IDのみ) で保存、pool/isPoolOpen は保存しない
 interface SavedSetItem {
     id: string;
     name: string;
@@ -14,8 +14,6 @@ interface SavedSet {
     id: string;
     name?: string;
     items: SavedSetItem[];
-    pool: number[];
-    isPoolOpen: boolean;
 }
 
 const pokemonById = (id: number): Pokemon | undefined =>
@@ -36,50 +34,67 @@ const resolvePokemonId = (raw: any): number | null => {
     return null;
 };
 
-/** localStorage からセットデータを読み込み、保存する */
+/** 使用中のポケモンIDのセットを取得 */
+const getUsedPokemonIds = (items: { pokemons: Pokemon[] }[]): globalThis.Set<number> => {
+    const usedIds = new globalThis.Set<number>();
+    for (const item of items) {
+        for (const p of item.pokemons) {
+            usedIds.add(p.id);
+        }
+    }
+    return usedIds;
+};
+
+/** 全ポケモンから使用済みを除いてpoolを算出 */
+const computePool = (items: { pokemons: Pokemon[] }[]): Pokemon[] => {
+    const usedIds = getUsedPokemonIds(items);
+    return samplePokemons.filter((p) => !usedIds.has(p.id));
+};
+
+/** localStorage / URL からセットデータを読み込み、RuntimeSetに変換する */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const deserializeSets = (parsed: any[]): Set[] => {
-    return parsed.map((set: any) => ({
-        ...set,
-        items: (set.items || []).map((item: any) => ({
+const deserializeSets = (parsed: any[]): RuntimeSet[] => {
+    return parsed.map((set: any) => {
+        const items = (set.items || []).map((item: any) => ({
             ...item,
             pokemons: (item.pokemons || [])
                 .map((p: any) => resolvePokemonId(p))
                 .filter((id: number | null): id is number => id !== null)
                 .map((id: number) => pokemonById(id))
                 .filter(Boolean),
-        })),
-        pool: (set.pool || [])
-            .map((p: any) => resolvePokemonId(p))
-            .filter((id: number | null): id is number => id !== null)
-            .map((id: number) => pokemonById(id))
-            .filter(Boolean),
-    }));
+        }));
+        return {
+            id: set.id,
+            name: set.name,
+            items,
+            pool: computePool(items),
+        };
+    });
 };
 
-const serializeSets = (sets: Set[]): SavedSet[] => {
+/** RuntimeSet を保存形式に変換する（pool/isPoolOpen は保存しない） */
+const serializeSets = (sets: RuntimeSet[]): SavedSet[] => {
     return sets.map((set) => ({
-        ...set,
+        id: set.id,
+        name: set.name,
         items: set.items.map((item) => ({
             ...item,
             pokemons: item.pokemons.map((p) => p.id),
         })),
-        pool: set.pool.map((p) => p.id),
     }));
 };
 
-const createInitialSet = (): Set => ({
+const createInitialSet = (): RuntimeSet => ({
     id: 'set_1',
     items: [
         { id: 'item_1', name: 'ターゲット', pokemons: [] },
         { id: 'item_2', name: '有利', pokemons: [] },
     ],
     pool: [...samplePokemons],
-    isPoolOpen: false,
 });
 
 export function useSetsStorage() {
-    const [sets, setSets] = useState<Set[]>([]);
+    const [sets, setSets] = useState<RuntimeSet[]>([]);
 
     // URLからの読み込みを優先、次いで localStorage
     useEffect(() => {

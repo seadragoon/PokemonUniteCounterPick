@@ -1,6 +1,6 @@
 import { memo, useState } from 'react';
 import { css } from '@linaria/core';
-import type { Set, Pokemon } from '../types';
+import type { RuntimeSet, Pokemon } from '../types';
 import { SetItemComponent } from './SetItemComponent';
 import { SortablePokemon } from './SortablePokemon';
 import { SetEditModal } from './SetEditModal';
@@ -9,11 +9,11 @@ import { useDroppable } from '@dnd-kit/core';
 import { samplePokemons } from '../data/pokemon';
 
 interface SetComponentProps {
-  set: Set;
+  set: RuntimeSet;
   index: number;
   isFirst: boolean;
   isLast: boolean;
-  onUpdate: (set: Set) => void;
+  onUpdate: (set: RuntimeSet) => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onDelete: () => void;
@@ -261,6 +261,7 @@ const SetComponentInner = ({
   isMobile,
 }: SetComponentProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPoolOpen, setIsPoolOpen] = useState(false);
   const handleItemNameChange = (itemId: string, newName: string) => {
     const updatedSet = {
       ...set,
@@ -276,7 +277,7 @@ const SetComponentInner = ({
   };
 
   const togglePool = () => {
-    onUpdate({ ...set, isPoolOpen: !set.isPoolOpen });
+    setIsPoolOpen((prev) => !prev);
   };
 
   const poolDroppableId = `pool-drop-${set.id}`;
@@ -402,11 +403,11 @@ const SetComponentInner = ({
       </div>
 
       <button className={poolToggle} onClick={togglePool}>
-        {set.isPoolOpen ? '▼ プールを閉じる' : '▶ プールを開く'}
+        {isPoolOpen ? '▼ プールを閉じる' : '▶ プールを開く'}
       </button>
 
       <div
-        className={set.isPoolOpen ? poolContainerOpen : poolContainerClosed}
+        className={isPoolOpen ? poolContainerOpen : poolContainerClosed}
       >
         <div
           ref={poolRef}

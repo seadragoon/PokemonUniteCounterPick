@@ -1,11 +1,11 @@
 import { memo } from 'react';
 import { css } from '@linaria/core';
-import type { Set } from '../types';
+import type { RuntimeSet } from '../types';
 import { PokemonImage } from './PokemonImage';
 
 interface SetViewComponentProps {
-    set: Set;
-    index: number;
+  set: RuntimeSet;
+  index: number;
 }
 
 const setContainer = css`
@@ -63,44 +63,44 @@ const emptyMessage = css`
 `;
 
 const SetViewComponentInner = ({ set, index }: SetViewComponentProps) => {
-    // ポケモンが1匹もいない場合は表示しない
-    const hasPokemons = set.items.some((item) => item.pokemons.length > 0);
-    if (!hasPokemons) {
-        return null;
-    }
+  // ポケモンが1匹もいない場合は表示しない
+  const hasPokemons = set.items.some((item) => item.pokemons.length > 0);
+  if (!hasPokemons) {
+    return null;
+  }
 
-    const displayName = set.name || `セット${index + 1}`;
-    // デフォルトのセット名（セット1, セット2...）の場合は表示しない（詰める）
-    const isDefaultSetName = /^セット\d+$/.test(displayName);
+  const displayName = set.name || `セット${index + 1}`;
+  // デフォルトのセット名（セット1, セット2...）の場合は表示しない（詰める）
+  const isDefaultSetName = /^セット\d+$/.test(displayName);
 
-    return (
-        <div className={setContainer}>
-            {!isDefaultSetName && <h3 className={setTitle}>{displayName}</h3>}
-            <div>
-                {set.items.map((item) => (
-                    <div key={item.id} className={itemContainer}>
-                        {/* 項目名が「ターゲット」の場合は表示しない（詰める） */}
-                        {item.name !== 'ターゲット' && (
-                            <span className={itemName}>{item.name}</span>
-                        )}
-                        <div className={pokemonList}>
-                            {item.pokemons.length === 0 ? (
-                                <div className={emptyMessage}>ポケモンなし</div>
-                            ) : (
-                                item.pokemons.map((pokemon) => (
-                                    <PokemonImage
-                                        key={pokemon.id}
-                                        pokemon={pokemon}
-                                        isSelected={false}
-                                    />
-                                ))
-                            )}
-                        </div>
-                    </div>
-                ))}
+  return (
+    <div className={setContainer}>
+      {!isDefaultSetName && <h3 className={setTitle}>{displayName}</h3>}
+      <div>
+        {set.items.map((item) => (
+          <div key={item.id} className={itemContainer}>
+            {/* 項目名が「ターゲット」の場合は表示しない（詰める） */}
+            {item.name !== 'ターゲット' && (
+              <span className={itemName}>{item.name}</span>
+            )}
+            <div className={pokemonList}>
+              {item.pokemons.length === 0 ? (
+                <div className={emptyMessage}>ポケモンなし</div>
+              ) : (
+                item.pokemons.map((pokemon) => (
+                  <PokemonImage
+                    key={pokemon.id}
+                    pokemon={pokemon}
+                    isSelected={false}
+                  />
+                ))
+              )}
             </div>
-        </div>
-    );
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export const SetViewComponent = memo(SetViewComponentInner);
