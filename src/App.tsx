@@ -545,7 +545,6 @@ function App() {
   };
 
   const handleDragStart = (event: DragStartEvent) => {
-    console.log("Drag Start: " + event.active.id);
     setActiveId(event.active.id as string);
   };
 
@@ -595,10 +594,7 @@ function App() {
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    console.log("Drag End: " + event.active.id);
     const { active, over } = event;
-    console.log("Active: ", active);
-    console.log("Over: ", over);
     setActiveId(null);
 
     // 同じ場所にドロップした場合は何もしない
