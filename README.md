@@ -1,15 +1,35 @@
-# ポケモンユナイト カウンターピック
+# Pokémon UNITE カウンターピックメーカー
 
-ポケモンユナイトの使用キャラの選択を支援するWebアプリです。
+ポケモンユナイトにおける、自分や構成に合わせた「ターゲット」「有利」「不利」などのポケモン相性を整理し、保存・共有できるWebアプリケーションです。  
+ドラッグ＆ドロップによる直感的な操作と、閲覧に特化した「ビューモード」を備え、自分だけのカウンターピックリストを簡単に作成できます。
 
-## 技術スタック
+## 🌐 サイトのURL（GitHub Pages）
+**[こちらのリンクからアプリを利用できます](https://seadragoon.github.io/PokemonUniteCounterPick/)**
+*(ご自身のリポジトリURLに置き換えてください)*
 
-- Framework: React
-- Build Tool: Vite (TypeScript)
-- CSS Library: Linaria (Zero-runtime CSS-in-JS)
-- D&D: @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities
+---
 
-## セットアップ
+## 🚀 主な機能
+
+- **直感的なドラッグ＆ドロップ操作**：ポケモン一覧（プール）から各項目へ、項目間から別の項目へ自由に移動。
+- **閲覧専用の「ビューモード」**：Pinterest風の美しいグリッドレイアウトで、構築したセットを一覧表示。
+- **URLを使った共有機能**：作成したリストを圧縮URL化し、SNSや友人にシェアすることが可能（URLパラメータでデータを復元）。
+- **カスタマイズ性の高さ**：セット名や各カテゴリ（項目）名を自由に編集可能。項目の順番の入れ替えにも対応。
+- **オートセーブ**：操作するたびにブラウザの `localStorage` へ自動保存。次回アクセス時にそのまま再開できます。
+- **レスポンシブデザイン**：PC・タブレット向けのリッチなレイアウトと、スマートフォン向けに最適化されたコンパクトUIを両立。
+
+## 🛠 技術スタック
+
+- **Framework**: React 19
+- **Build Tool**: Vite (TypeScript)
+- **CSS Library**: Linaria (Zero-runtime CSS-in-JS)
+- **Drag & Drop**: @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities
+- **Icons**: React Icons (lucide-react等)
+- **Hosting**: GitHub Pages (GitHub ActionsによるCI/CDデプロイ)
+
+## 💻 開発・セットアップ
+
+プロジェクトを手元で実行・開発する場合の手順です。
 
 ### 1. 依存関係のインストール
 
@@ -17,49 +37,25 @@
 npm install
 ```
 
-新規でパッケージを追加する場合は以下を実行してください。
-
-```bash
-npm install @linaria/core @linaria/react @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
-npm install -D @linaria/vite
-```
-
 ### 2. 開発サーバーの起動
 
 ```bash
 npm run dev
 ```
+起動後、ターミナルに表示される `http://localhost:XXXX` にアクセスしてください。
 
-### 3. ビルド
+### 3. 本番ビルド
 
 ```bash
 npm run build
 ```
+`dist/` ディレクトリに公開用のファイル群が出力されます。
 
-### 4. プレビュー
+## ⚖️ 免責事項・権利表記について
 
-```bash
-npm run preview
-```
+### 画像素材の出典
+本アプリケーションで使用しているポケモンのアイコン画像は、**[Unite-DB](https://unite-db.com/)** 様のサイトより拝借させていただいております。
 
-## 画像について
-
-サンプルデータでは `/images/xxx.png` を参照しています。  
-`public/images/` フォルダにポケモン画像を配置してください（例: `public/images/pikachu.png`）。  
-画像が存在しない場合は、Role に応じた背景色のみが表示されます。
-
-## GitHub Pages での公開
-
-- `vite.config.ts` の `base` は `./` に設定済みです。
-- `.github/workflows/deploy.yml` で `main` ブランチへの push 時にビルド・デプロイされます。
-- リポジトリの Settings → Pages で「GitHub Actions」を選択してください。
-
-## 主な機能
-
-- セットの追加・削除・上下での並び替え
-- 項目名（ターゲット・有利など）のクリック編集
-- プールのアコーディオン開閉
-- ドラッグ＆ドロップでのポケモン配置
-- タップで選択 → 移動先エリアをタップで配置（モバイル向け）
-- localStorage への自動保存（リロードで復元）
-- Reset ボタンで全データ削除（確認ダイアログあり）
+### 権利表記
+当サイトはファンによる非営利目的のプロジェクトであり、株式会社ポケモン、Nintendo、Creatures Inc.、GAME FREAK inc.、およびTencent Gamesとは一切関係ありません。
+『Pokémon UNITE』に関するすべての画像および知的財産権は、各権利者に帰属します。
