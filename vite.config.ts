@@ -13,7 +13,7 @@ export default defineConfig({
       },
     }),
   ],
-  base: './',
+  base: '/PokemonUniteCounterPick/',
   server: {
     host: true,
   },
