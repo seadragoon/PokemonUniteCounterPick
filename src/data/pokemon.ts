@@ -91,7 +91,7 @@ export const samplePokemons: Pokemon[] = [
   { id: 426, name: 'メガルカリオ', en_name: 'megLucario', role: Role.AllRounder, image: '/icons/Mega-Lucario.png' },
   { id: 427, name: 'ネギガナイト', en_name: 'sirfetch', role: Role.AllRounder, image: '/icons/Sirfetchd.png' },
   { id: 428, name: 'メガリザードンX', en_name: 'megaCharizardX', role: Role.AllRounder, image: '/icons/Mega-Charizard-X.png' },
-  { id: 429, name: 'メガリザードンY', en_name: 'megaCharizardY', role: Role.Attacker, image: '/icons/Mega-Charizard-Y.png' },
+  { id: 429, name: 'メガリザードンY', en_name: 'megaCharizardY', role: Role.AllRounder, image: '/icons/Mega-Charizard-Y.png' },
   { id: 430, name: 'メガギャラドス', en_name: 'megaGyarados', role: Role.AllRounder, image: '/icons/Mega-Gyarados.png' },
   // サポート型 (Support) 501〜
   { id: 501, name: 'キュワワー', en_name: 'comfey', role: Role.Support, image: '/icons/Comfey.png' },
