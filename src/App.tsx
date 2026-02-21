@@ -9,7 +9,10 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
-  closestCorners,
+  pointerWithin,
+  rectIntersection,
+  closestCenter,
+  type CollisionDetection,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import type { RuntimeSet, Pokemon } from './types';
@@ -1000,6 +1003,23 @@ function App() {
     })()
     : null;
 
+  const customCollisionDetection: CollisionDetection = useCallback((args) => {
+    // 1. 直感的なポインター（マウス座標）をベースに判定
+    const pointerCollisions = pointerWithin(args);
+    if (pointerCollisions.length > 0) {
+      return pointerCollisions;
+    }
+
+    // 2. それで見つからなかった場合（スクロール時など）、四角形が重なる要素を探す
+    const rectCollisions = rectIntersection(args);
+    if (rectCollisions.length > 0) {
+      return rectCollisions;
+    }
+
+    // 3. 最後のフォールバックに中心距離を見る
+    return closestCenter(args);
+  }, []);
+
   return (
     <div className={appContainer} style={{ paddingTop: headerHeight + 16 }}>
       <header className={header} ref={headerRef}>
@@ -1123,7 +1143,7 @@ function App() {
       ) : (
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCorners}
+          collisionDetection={customCollisionDetection}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
