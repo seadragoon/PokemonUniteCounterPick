@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { RuntimeSet, Pokemon } from '../types';
 import { samplePokemons } from '../data/pokemon';
 
@@ -136,8 +136,26 @@ const fromBase64Url = (str: string): Uint8Array => {
     return Uint8Array.from(binary, (c) => c.charCodeAt(0));
 };
 
+/** localStorage からセットデータを読み込む */
+const loadSetsFromStorage = (): RuntimeSet[] => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+        try {
+            return deserializeSets(JSON.parse(saved));
+        } catch (e) {
+            console.error('Failed to load saved data:', e);
+        }
+    }
+    return [];
+};
+
 export function useSetsStorage() {
+    // 現在表示中のセットデータ（URLデータまたはlocalStorageデータ）
     const [sets, setSets] = useState<RuntimeSet[]>([]);
+    // URLから読み込んだデータを別途保持（nullならURLデータなし）
+    const [urlSets, setUrlSets] = useState<RuntimeSet[] | null>(null);
+    // 現在URLデータを表示中かどうか
+    const [isShowingUrlData, setIsShowingUrlData] = useState(false);
     const [loadedFromUrl, setLoadedFromUrl] = useState(false);
     const loadedRef = useRef(false);
 
@@ -162,7 +180,11 @@ export function useSetsStorage() {
                     jsonStr = new TextDecoder().decode(bytes);
                 }
                 const parsed = JSON.parse(jsonStr);
-                setSets(deserializeSets(parsed));
+                const urlData_ = deserializeSets(parsed);
+                // URLデータを表示用にセットし、別途urlSetsに保持
+                setSets(urlData_);
+                setUrlSets(urlData_);
+                setIsShowingUrlData(true);
                 window.history.replaceState({}, '', window.location.pathname);
                 return true;
             } catch (e) {
@@ -172,13 +194,9 @@ export function useSetsStorage() {
         };
 
         const loadFromStorage = () => {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                try {
-                    setSets(deserializeSets(JSON.parse(saved)));
-                } catch (e) {
-                    console.error('Failed to load saved data:', e);
-                }
+            const storedSets = loadSetsFromStorage();
+            if (storedSets.length > 0) {
+                setSets(storedSets);
             } else {
                 setSets([createInitialSet()]);
             }
@@ -193,12 +211,12 @@ export function useSetsStorage() {
         });
     }, []);
 
-    // 保存
+    // 保存: URLデータ表示中はlocalStorageに保存しない
     useEffect(() => {
-        if (sets.length > 0) {
+        if (sets.length > 0 && !isShowingUrlData) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeSets(sets)));
         }
-    }, [sets]);
+    }, [sets, isShowingUrlData]);
 
     const clearStorage = () => {
         localStorage.removeItem(STORAGE_KEY);
@@ -214,5 +232,32 @@ export function useSetsStorage() {
         return url.toString();
     };
 
-    return { sets, setSets, clearStorage, getShareUrl, loadedFromUrl };
+    /** 自分のデータ（localStorage）に戻す */
+    const restoreOwnData = useCallback(() => {
+        const storedSets = loadSetsFromStorage();
+        if (storedSets.length > 0) {
+            setSets(storedSets);
+        } else {
+            setSets([createInitialSet()]);
+        }
+        setUrlSets(null);
+        setIsShowingUrlData(false);
+    }, []);
+
+    /** URLデータで自分のデータを上書きする */
+    const overwriteWithUrlData = useCallback(() => {
+        if (urlSets) {
+            setSets(urlSets);
+            // 上書き後はlocalStorageに保存されるようにフラグを解除
+            setIsShowingUrlData(false);
+            setUrlSets(null);
+        }
+    }, [urlSets]);
+
+    return {
+        sets, setSets,
+        clearStorage, getShareUrl,
+        loadedFromUrl, isShowingUrlData,
+        restoreOwnData, overwriteWithUrlData,
+    };
 }

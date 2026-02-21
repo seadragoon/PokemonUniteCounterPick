@@ -18,6 +18,7 @@ import { SetComponent } from './components/SetComponent';
 import { SetViewComponent } from './components/SetViewComponent';
 import { PokemonImage } from './components/PokemonImage';
 import { useSetsStorage, isSetSaveable } from './hooks/useSetsStorage';
+import { OverwriteConfirmModal } from './components/OverwriteConfirmModal';
 import { VariableSize, Size, MOBILE_BREAKPOINT, HEADER_BREAKPOINT } from './constants/cssSize';
 import utils from './utils';
 
@@ -429,7 +430,7 @@ const footerCopyright = css`
 `;
 
 function App() {
-  const { sets, setSets, clearStorage, getShareUrl, loadedFromUrl } = useSetsStorage();
+  const { sets, setSets, clearStorage, getShareUrl, loadedFromUrl, isShowingUrlData, restoreOwnData, overwriteWithUrlData } = useSetsStorage();
   const hasSaveableData = sets.some(isSetSaveable);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedPokemon, setSelectedPokemon] = useState<{
@@ -440,6 +441,7 @@ function App() {
   const [viewMode, setViewMode] = useState<'edit' | 'view'>('edit');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRow2Open, setIsRow2Open] = useState(true); // PCヘッダー2段目の開閉
+  const [isOverwriteModalOpen, setIsOverwriteModalOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const [headerHeight, setHeaderHeight] = useState(70);
 
@@ -497,6 +499,31 @@ function App() {
     };
     setSets([...sets, newSet]);
   };
+
+  // 編集モードに切り替えるハンドラ（URLデータ表示中なら確認モーダルを表示）
+  const handleSwitchToEdit = useCallback(() => {
+    if (isShowingUrlData) {
+      setIsOverwriteModalOpen(true);
+    } else {
+      setViewMode('edit');
+    }
+  }, [isShowingUrlData]);
+
+
+
+  // モーダル: 自分のデータを利用
+  const handleKeepOwnData = useCallback(() => {
+    restoreOwnData();
+    setIsOverwriteModalOpen(false);
+    setViewMode('edit');
+  }, [restoreOwnData]);
+
+  // モーダル: 読み込んだデータで上書き
+  const handleOverwriteData = useCallback(() => {
+    overwriteWithUrlData();
+    setIsOverwriteModalOpen(false);
+    setViewMode('edit');
+  }, [overwriteWithUrlData]);
 
   const handleShare = async () => {
     try {
@@ -986,7 +1013,7 @@ function App() {
       <header className={header} ref={headerRef}>
         {/* 1段目: タイトル + 共有ボタン + モード切替 + 開閉ボタン */}
         <div className={headerRow1}>
-          <h1 className={title}>PokemonUnite CounterPick Maker</h1>
+          <h1 className={title}>Unite CounterPick Maker</h1>
           <div className={headerRow1Right}>
             <button className={shareButton} onClick={handleShare} disabled={!hasSaveableData} style={{ display: 'inline-flex', alignItems: 'center', gap: Size(6) }}>
               リンク作成
@@ -995,7 +1022,7 @@ function App() {
             <div className={toggleButtonGroup}>
               <button
                 className={`${toggleButton} ${viewMode === 'edit' ? activeToggleButton : ''}`}
-                onClick={() => setViewMode('edit')}
+                onClick={handleSwitchToEdit}
               >
                 編集モード
               </button>
@@ -1041,7 +1068,7 @@ function App() {
           <div className={toggleButtonGroup}>
             <button
               className={`${toggleButton} ${viewMode === 'edit' ? activeToggleButton : ''}`}
-              onClick={() => setViewMode('edit')}
+              onClick={handleSwitchToEdit}
             >
               編集モード
             </button>
@@ -1151,6 +1178,13 @@ function App() {
           ©2026 Developed by seadragoon
         </p>
       </footer>
+
+      <OverwriteConfirmModal
+        isOpen={isOverwriteModalOpen}
+        onClose={() => setIsOverwriteModalOpen(false)}
+        onKeepOwn={handleKeepOwnData}
+        onOverwrite={handleOverwriteData}
+      />
     </div>
   );
 }

@@ -155,7 +155,7 @@ const PokemonImageInner = ({
         style={{ backgroundColor: roleColor }}
       />
       <img
-        src={`${import.meta.env.BASE_URL}${pokemon.image.replace(/^\//, '')}`}
+        src={`${(import.meta.env && import.meta.env.BASE_URL) || '/'}${pokemon.image.replace(/^\//, '')}`}
         alt={pokemon.name}
         className={image}
         onError={(e) => {
