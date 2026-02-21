@@ -143,6 +143,7 @@ const PokemonImageInner = ({
     <div
       className={containerClass}
       style={sizeStyle}
+      title={pokemon.name}
       onClick={(e) => {
         if (onClick) {
           e.stopPropagation();
