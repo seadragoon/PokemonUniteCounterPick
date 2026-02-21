@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { css } from '@linaria/core';
-import { Size } from '../constants/cssSize';
+import { Size } from '../../constants/cssSize';
 import { ModalBase } from './ModalBase';
-import utils from '../utils';
+import utils from '../../utils';
 
 interface SetItemEditModalProps {
   isOpen: boolean;

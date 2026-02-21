@@ -18,7 +18,7 @@ import { SetComponent } from './components/SetComponent';
 import { SetViewComponent } from './components/SetViewComponent';
 import { PokemonImage } from './components/PokemonImage';
 import { useSetsStorage, isSetSaveable } from './hooks/useSetsStorage';
-import { OverwriteConfirmModal } from './components/OverwriteConfirmModal';
+import { OverwriteConfirmModal } from './components/modals/OverwriteConfirmModal';
 import { VariableSize, Size, MOBILE_BREAKPOINT, HEADER_BREAKPOINT } from './constants/cssSize';
 import utils from './utils';
 

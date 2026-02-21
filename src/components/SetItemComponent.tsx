@@ -5,7 +5,7 @@ import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import type { SetItem, Pokemon } from '../types';
 import { SortablePokemon } from './SortablePokemon';
 import { useDroppable, useDndContext } from '@dnd-kit/core';
-import { SetItemEditModal } from './SetItemEditModal';
+import { SetItemEditModal } from './modals/SetItemEditModal';
 
 interface SetItemComponentProps {
   item: SetItem;

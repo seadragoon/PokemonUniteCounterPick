@@ -4,7 +4,7 @@ import { Size } from '../constants/cssSize';
 import type { RuntimeSet, Pokemon } from '../types';
 import { SetItemComponent } from './SetItemComponent';
 import { SortablePokemon } from './SortablePokemon';
-import { SetEditModal } from './SetEditModal';
+import { SetEditModal } from './modals/SetEditModal';
 import { SortableContext, rectSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { samplePokemons } from '../data/pokemon';

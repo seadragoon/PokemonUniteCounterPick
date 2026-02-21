@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { css } from '@linaria/core';
-import { Size } from '../constants/cssSize';
+import { Size } from '../../constants/cssSize';
 
 interface ModalBaseProps {
   isOpen: boolean;

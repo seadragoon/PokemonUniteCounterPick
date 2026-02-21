@@ -1,6 +1,6 @@
 import { css } from '@linaria/core';
 import { ModalBase } from './ModalBase';
-import { Size } from '../constants/cssSize';
+import { Size } from '../../constants/cssSize';
 
 interface OverwriteConfirmModalProps {
   isOpen: boolean;
