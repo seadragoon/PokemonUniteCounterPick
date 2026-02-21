@@ -429,7 +429,7 @@ const footerCopyright = css`
 `;
 
 function App() {
-  const { sets, setSets, clearStorage } = useSetsStorage();
+  const { sets, setSets, clearStorage, getShareUrl } = useSetsStorage();
   const hasSaveableData = sets.some(isSetSaveable);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedPokemon, setSelectedPokemon] = useState<{
@@ -478,7 +478,6 @@ function App() {
     })
   );
 
-
   const handleAddSet = () => {
     const ts = Date.now();
     const newSet: RuntimeSet = {
@@ -491,8 +490,6 @@ function App() {
     };
     setSets([...sets, newSet]);
   };
-
-  const { getShareUrl } = useSetsStorage();
 
   const handleShare = async () => {
     try {
