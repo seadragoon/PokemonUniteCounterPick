@@ -1,4 +1,4 @@
-export default class AppUtility {
+export default class utils {
   /**
    * nullまたはundefindかどうか判定
    * @param obj 任意のオブジェクト
@@ -117,7 +117,7 @@ export default class AppUtility {
    * アドレス欄のハッシュ値を削除
    */
   public static removeLocationHash(): void {
-    if (!AppUtility.isEmpty(window.location.hash)) {
+    if (!utils.isEmpty(window.location.hash)) {
       window.history.pushState({}, document.title, window.location.href.replace(window.location.hash, ""));
     }
   }

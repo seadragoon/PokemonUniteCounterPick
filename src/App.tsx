@@ -19,7 +19,7 @@ import { SetViewComponent } from './components/SetViewComponent';
 import { PokemonImage } from './components/PokemonImage';
 import { useSetsStorage, isSetSaveable } from './hooks/useSetsStorage';
 import { VariableSize, Size, MOBILE_BREAKPOINT, HEADER_BREAKPOINT } from './constants/cssSize';
-import AppUtility from './utils/appUtility';
+import utils from './utils';
 
 const appContainer = css`
   min-height: 100vh;
@@ -1016,9 +1016,9 @@ function App() {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
-            <span style={{ transform: isMenuOpen ? AppUtility.getFormatText('rotate(45deg) translate({0}, {1})', Size(5), Size(5)) : 'none' }} />
+            <span style={{ transform: isMenuOpen ? utils.getFormatText('rotate(45deg) translate({0}, {1})', Size(5), Size(5)) : 'none' }} />
             <span style={{ opacity: isMenuOpen ? 0 : 1 }} />
-            <span style={{ transform: isMenuOpen ? AppUtility.getFormatText('rotate(-45deg) translate({0}, -{1})', Size(5), Size(5)) : 'none' }} />
+            <span style={{ transform: isMenuOpen ? utils.getFormatText('rotate(-45deg) translate({0}, -{1})', Size(5), Size(5)) : 'none' }} />
           </button>
         </div>
 
@@ -1125,8 +1125,8 @@ function App() {
                 isMobile={isMobile}
               />
             ))}
-            <div style={{ display: 'flex', justifyContent: 'center', padding: AppUtility.getFormatText("{0} {1}", Size(20), Size(0)) }}>
-              <button className={addButton} onClick={handleAddSet} style={{ fontSize: Size(18), padding: AppUtility.getFormatText("{0} {1}", Size(14), Size(32)) }}>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: utils.getFormatText("{0} {1}", Size(20), Size(0)) }}>
+              <button className={addButton} onClick={handleAddSet} style={{ fontSize: Size(18), padding: utils.getFormatText("{0} {1}", Size(14), Size(32)) }}>
                 + セットを追加
               </button>
             </div>

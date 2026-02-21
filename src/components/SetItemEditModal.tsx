@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { css } from '@linaria/core';
 import { Size } from '../constants/cssSize';
 import { ModalBase } from './ModalBase';
-import AppUtility from '../utils/appUtility';
+import utils from '../utils';
 
 interface SetItemEditModalProps {
   isOpen: boolean;
@@ -154,7 +154,7 @@ export function SetItemEditModal({
         </button>
       </div>
 
-      <hr style={{ border: 'none', borderTop: AppUtility.getFormatText("{0} solid #eee", Size(1)), margin: AppUtility.getFormatText("{0} {1}", Size(20), Size(0)) }} />
+      <hr style={{ border: 'none', borderTop: utils.getFormatText("{0} solid #eee", Size(1)), margin: utils.getFormatText("{0} {1}", Size(20), Size(0)) }} />
 
       {/* Add Section */}
       <div className={section}>
