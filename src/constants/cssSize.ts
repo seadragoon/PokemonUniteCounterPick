@@ -2,6 +2,14 @@
 // ※ ブラウザAPI (document, getComputedStyle等) に依存しない純粋関数のみ定義
 //    → Linaria の css テンプレート内で ${Size(px)} のように使用可能
 
+// ========== ブレークポイント定義 ==========
+
+/** モバイル判定のブレークポイント (px) */
+export const MOBILE_BREAKPOINT = 820;
+
+/** ヘッダーのサイズが足りなくなる地点のブレークポイント (px) */
+export const HEADER_BREAKPOINT = 1020;
+
 // px値からremに変換
 const PixelToRem = (px: number): number => {
     return parseFloat((px / 16).toFixed(3));

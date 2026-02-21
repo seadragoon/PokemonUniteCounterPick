@@ -18,7 +18,7 @@ import { SetComponent } from './components/SetComponent';
 import { SetViewComponent } from './components/SetViewComponent';
 import { PokemonImage } from './components/PokemonImage';
 import { useSetsStorage, isSetSaveable } from './hooks/useSetsStorage';
-import { VariableSize, Size } from './constants/cssSize';
+import { VariableSize, Size, MOBILE_BREAKPOINT, HEADER_BREAKPOINT } from './constants/cssSize';
 
 const appContainer = css`
   min-height: 100vh;
@@ -38,7 +38,7 @@ const viewModeContainer = css`
   column-gap: ${Size(20)};
   padding: 0 ${Size(10)};
 
-  @media (min-width: 820px) {
+  @media (min-width: ${MOBILE_BREAKPOINT}px) {
     column-count: 2;
   }
 
@@ -61,7 +61,7 @@ const toggleButton = css`
   padding: ${Size(8)} ${Size(16)};
   border: none;
   border-radius: ${Size(6)};
-  font-size: ${VariableSize(12, 16, 820, 1020)};
+  font-size: ${VariableSize(12, 16, MOBILE_BREAKPOINT, HEADER_BREAKPOINT)};
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
@@ -102,7 +102,7 @@ const header = css`
   backdrop-filter: blur(${Size(10)});
   box-shadow: 0 ${Size(4)} ${Size(12)} rgba(0, 0, 0, 0.15);
 
-  @media (max-width: 820px) {
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
     padding: ${Size(8)} ${Size(12)};
   }
 `;
@@ -120,7 +120,7 @@ const headerRow1Right = css`
   align-items: center;
   gap: ${Size(10)};
 
-  @media (max-width: 820px) {
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
     display: none;
   }
 `;
@@ -143,7 +143,7 @@ const headerRow2 = css`
     padding-top: ${Size(8)};
   }
 
-  @media (max-width: 820px) {
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
     display: none;
   }
 `;
@@ -164,20 +164,20 @@ const row2ToggleButton = css`
     background: rgba(255, 255, 255, 0.3);
   }
 
-  @media (max-width: 820px) {
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
     display: none;
   }
 `;
 
 const title = css`
   color: white;
-  font-size: ${VariableSize(22, 32, 820, 1020)};
+  font-size: ${VariableSize(22, 32, MOBILE_BREAKPOINT, HEADER_BREAKPOINT)};
   font-weight: bold;
   margin: 0;
   text-shadow: ${Size(2)} ${Size(2)} ${Size(4)} rgba(0, 0, 0, 0.3);
   white-space: nowrap;
 
-  @media (max-width: 820px) {
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
     font-size: ${Size(22)};
   }
 `;
@@ -202,7 +202,7 @@ const hamburgerButton = css`
     transition: all 0.3s;
   }
 
-  @media (max-width: 820px) {
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
     display: flex;
   }
 `;
@@ -212,7 +212,7 @@ const mobileMenu = css`
   gap: ${Size(10)};
   align-items: center;
 
-  @media (max-width: 820px) {
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -241,7 +241,7 @@ const mobileMenu = css`
 const menuOverlay = css`
   display: none;
 
-  @media (max-width: 820px) {
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
     display: block;
     position: fixed;
     top: 0;
@@ -266,7 +266,7 @@ const buttonGroup = css`
   gap: ${Size(10)};
   flex-wrap: wrap;
 
-  @media (max-width: 820px) {
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
     justify-content: stretch;
     flex-direction: column;
     width: 100%;
@@ -287,7 +287,7 @@ const addButton = css`
   padding: ${Size(10)} ${Size(20)};
   border: none;
   border-radius: ${Size(8)};
-  font-size: ${Size(16)};
+  font-size: ${VariableSize(12, 16, MOBILE_BREAKPOINT, HEADER_BREAKPOINT)};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -316,7 +316,7 @@ const resetButton = css`
   padding: ${Size(10)} ${Size(20)};
   border: none;
   border-radius: ${Size(8)};
-  font-size: ${Size(16)};
+  font-size: ${VariableSize(12, 16, MOBILE_BREAKPOINT, HEADER_BREAKPOINT)};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -345,7 +345,7 @@ const shareButton = css`
   padding: ${Size(10)} ${Size(20)};
   border: none;
   border-radius: ${Size(8)};
-  font-size: ${VariableSize(12, 16, 820, 1020)};
+  font-size: ${VariableSize(12, 16, MOBILE_BREAKPOINT, HEADER_BREAKPOINT)};
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
@@ -442,10 +442,10 @@ function App() {
   const headerRef = useRef<HTMLElement>(null);
   const [headerHeight, setHeaderHeight] = useState(70);
 
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 820);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= MOBILE_BREAKPOINT);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 820);
+    const handleResize = () => setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);

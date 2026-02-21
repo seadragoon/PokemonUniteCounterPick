@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { css } from '@linaria/core';
-import { Size } from '../constants/cssSize';
+import { Size, MOBILE_BREAKPOINT } from '../constants/cssSize';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import type { SetItem, Pokemon } from '../types';
 import { SortablePokemon } from './SortablePokemon';
@@ -36,7 +36,7 @@ const itemContainer = css`
   align-items: stretch;
   position: relative;
 
-  @media (max-width: 820px) {
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
     flex-direction: column;
   }
 `;
@@ -52,7 +52,7 @@ const itemHeader = css`
   width: ${Size(160)};
   flex-shrink: 0;
 
-  @media (max-width: 820px) {
+  @media (max-width: ${MOBILE_BREAKPOINT}px) {
     width: 100%;
     border-right: none;
     border-bottom: ${Size(1)} solid rgba(102, 126, 234, 0.3);
