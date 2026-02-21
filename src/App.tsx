@@ -34,19 +34,15 @@ const appContainer = css`
 `;
 
 const viewModeContainer = css`
-  max-width: ${Size(1400)};
+  max-width: ${Size(2400)};
   margin: 0 auto;
-  column-count: 1;
+  column-width: ${Size(380)}; /* カラムの理想的な幅。これに基づき自動で列数が増やされます */
   column-gap: ${Size(20)};
-  padding: 0 ${Size(10)};
+  padding: 0 ${Size(20)};
 
-  @media (min-width: ${Size(MOBILE_BREAKPOINT)}) {
-    column-count: 2;
-  }
-
-  @media (min-width: ${Size(1200)}) {
-    column-count: 3;
-    padding: 0;
+  @media (max-width: ${Size(MOBILE_BREAKPOINT)}) {
+    column-count: 1; /* モバイルでは強制的に1列 */
+    padding: 0 ${Size(10)};
   }
 `;
 
