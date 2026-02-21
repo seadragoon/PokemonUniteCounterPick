@@ -429,7 +429,7 @@ const footerCopyright = css`
 `;
 
 function App() {
-  const { sets, setSets, clearStorage, getShareUrl } = useSetsStorage();
+  const { sets, setSets, clearStorage, getShareUrl, loadedFromUrl } = useSetsStorage();
   const hasSaveableData = sets.some(isSetSaveable);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedPokemon, setSelectedPokemon] = useState<{
@@ -450,6 +450,13 @@ function App() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // URLからデータを読み込んだ場合は表示モードで開始
+  useEffect(() => {
+    if (loadedFromUrl) {
+      setViewMode('view');
+    }
+  }, [loadedFromUrl]);
 
   // ヘッダー高さを測定してpadding-topを動的に設定
   useEffect(() => {

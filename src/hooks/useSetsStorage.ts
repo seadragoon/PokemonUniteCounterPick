@@ -138,6 +138,7 @@ const fromBase64Url = (str: string): Uint8Array => {
 
 export function useSetsStorage() {
     const [sets, setSets] = useState<RuntimeSet[]>([]);
+    const [loadedFromUrl, setLoadedFromUrl] = useState(false);
     const loadedRef = useRef(false);
 
     // URLからの読み込みを優先、次いで localStorage
@@ -184,7 +185,11 @@ export function useSetsStorage() {
         };
 
         loadFromUrl().then((loaded) => {
-            if (!loaded) loadFromStorage();
+            if (loaded) {
+                setLoadedFromUrl(true);
+            } else {
+                loadFromStorage();
+            }
         });
     }, []);
 
@@ -209,5 +214,5 @@ export function useSetsStorage() {
         return url.toString();
     };
 
-    return { sets, setSets, clearStorage, getShareUrl };
+    return { sets, setSets, clearStorage, getShareUrl, loadedFromUrl };
 }
