@@ -56,6 +56,16 @@ const pokemonList = css`
   border-radius: ${Size(8)};
 `;
 
+const pokemonListLarge = css`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${Size(10)};
+  background: rgba(102, 126, 234, 0.05);
+  padding: ${Size(10)};
+  border-radius: ${Size(8)};
+  align-items: center;
+`;
+
 const emptyMessage = css`
   color: #999;
   font-size: ${Size(14)};
@@ -78,27 +88,31 @@ const SetViewComponentInner = ({ set, index }: SetViewComponentProps) => {
     <div className={setContainer}>
       {!isDefaultSetName && <h3 className={setTitle}>{displayName}</h3>}
       <div>
-        {set.items.map((item) => (
-          <div key={item.id} className={itemContainer}>
-            {/* 項目名が「ターゲット」の場合は表示しない（詰める） */}
-            {item.name !== 'ターゲット' && (
-              <span className={itemName}>{item.name}</span>
-            )}
-            <div className={pokemonList}>
-              {item.pokemons.length === 0 ? (
-                <div className={emptyMessage}>ポケモンなし</div>
-              ) : (
-                item.pokemons.map((pokemon) => (
-                  <PokemonImage
-                    key={pokemon.id}
-                    pokemon={pokemon}
-                    isSelected={false}
-                  />
-                ))
+        {set.items.map((item, itemIndex) => {
+          const isFirstItem = itemIndex === 0;
+          return (
+            <div key={item.id} className={itemContainer}>
+              {/* 項目名が「ターゲット」の場合は表示しない（詰める） */}
+              {item.name !== 'ターゲット' && (
+                <span className={itemName}>{item.name}</span>
               )}
+              <div className={isFirstItem ? pokemonListLarge : pokemonList}>
+                {item.pokemons.length === 0 ? (
+                  <div className={emptyMessage}>ポケモンなし</div>
+                ) : (
+                  item.pokemons.map((pokemon) => (
+                    <PokemonImage
+                      key={pokemon.id}
+                      pokemon={pokemon}
+                      isSelected={false}
+                      size={isFirstItem ? 50 : undefined}
+                    />
+                  ))
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

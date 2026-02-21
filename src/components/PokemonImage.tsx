@@ -8,6 +8,8 @@ interface PokemonImageProps {
   isDragging?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
+  /** カスタムサイズ (px単位、Sizeに変換される)。省略時はデフォルト40 */
+  size?: number;
 }
 
 const getRoleColor = (role: Role): string => {
@@ -124,6 +126,7 @@ const PokemonImageInner = ({
   isDragging = false,
   isSelected = false,
   onClick,
+  size,
 }: PokemonImageProps) => {
   const roleColor = getRoleColor(pokemon.role);
   const containerClass = isDragging
@@ -132,9 +135,14 @@ const PokemonImageInner = ({
       ? imageContainerSelected
       : imageContainer;
 
+  const sizeStyle = size
+    ? { width: Size(size), height: Size(size) }
+    : undefined;
+
   return (
     <div
       className={containerClass}
+      style={sizeStyle}
       onClick={(e) => {
         if (onClick) {
           e.stopPropagation();
