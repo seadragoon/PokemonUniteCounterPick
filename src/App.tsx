@@ -9,7 +9,7 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
-  pointerWithin,
+  closestCorners,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import type { RuntimeSet, Pokemon } from './types';
@@ -1127,7 +1127,7 @@ function App() {
       ) : (
         <DndContext
           sensors={sensors}
-          collisionDetection={pointerWithin}
+          collisionDetection={closestCorners}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
