@@ -19,6 +19,7 @@ import { SetViewComponent } from './components/SetViewComponent';
 import { PokemonImage } from './components/PokemonImage';
 import { useSetsStorage, isSetSaveable } from './hooks/useSetsStorage';
 import { VariableSize, Size, MOBILE_BREAKPOINT, HEADER_BREAKPOINT } from './constants/cssSize';
+import AppUtility from './utils/appUtility';
 
 const appContainer = css`
   min-height: 100vh;
@@ -38,11 +39,11 @@ const viewModeContainer = css`
   column-gap: ${Size(20)};
   padding: 0 ${Size(10)};
 
-  @media (min-width: ${MOBILE_BREAKPOINT}px) {
+  @media (min-width: ${Size(MOBILE_BREAKPOINT)}) {
     column-count: 2;
   }
 
-  @media (min-width: 1200px) {
+  @media (min-width: ${Size(1200)}) {
     column-count: 3;
     padding: 0;
   }
@@ -102,7 +103,7 @@ const header = css`
   backdrop-filter: blur(${Size(10)});
   box-shadow: 0 ${Size(4)} ${Size(12)} rgba(0, 0, 0, 0.15);
 
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+  @media (max-width: ${Size(MOBILE_BREAKPOINT)}) {
     padding: ${Size(8)} ${Size(12)};
   }
 `;
@@ -120,7 +121,7 @@ const headerRow1Right = css`
   align-items: center;
   gap: ${Size(10)};
 
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+  @media (max-width: ${Size(MOBILE_BREAKPOINT)}) {
     display: none;
   }
 `;
@@ -143,7 +144,7 @@ const headerRow2 = css`
     padding-top: ${Size(8)};
   }
 
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+  @media (max-width: ${Size(MOBILE_BREAKPOINT)}) {
     display: none;
   }
 `;
@@ -164,7 +165,7 @@ const row2ToggleButton = css`
     background: rgba(255, 255, 255, 0.3);
   }
 
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+  @media (max-width: ${Size(MOBILE_BREAKPOINT)}) {
     display: none;
   }
 `;
@@ -177,7 +178,7 @@ const title = css`
   text-shadow: ${Size(2)} ${Size(2)} ${Size(4)} rgba(0, 0, 0, 0.3);
   white-space: nowrap;
 
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+  @media (max-width: ${Size(MOBILE_BREAKPOINT)}) {
     font-size: ${Size(22)};
   }
 `;
@@ -202,7 +203,7 @@ const hamburgerButton = css`
     transition: all 0.3s;
   }
 
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+  @media (max-width: ${Size(MOBILE_BREAKPOINT)}) {
     display: flex;
   }
 `;
@@ -212,7 +213,7 @@ const mobileMenu = css`
   gap: ${Size(10)};
   align-items: center;
 
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+  @media (max-width: ${Size(MOBILE_BREAKPOINT)}) {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -241,7 +242,7 @@ const mobileMenu = css`
 const menuOverlay = css`
   display: none;
 
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+  @media (max-width: ${Size(MOBILE_BREAKPOINT)}) {
     display: block;
     position: fixed;
     top: 0;
@@ -266,7 +267,7 @@ const buttonGroup = css`
   gap: ${Size(10)};
   flex-wrap: wrap;
 
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+  @media (max-width: ${Size(MOBILE_BREAKPOINT)}) {
     justify-content: stretch;
     flex-direction: column;
     width: 100%;
@@ -983,7 +984,7 @@ function App() {
         <div className={headerRow1}>
           <h1 className={title}>PokemonUnite CounterPick Maker</h1>
           <div className={headerRow1Right}>
-            <button className={shareButton} onClick={handleShare} disabled={!hasSaveableData} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <button className={shareButton} onClick={handleShare} disabled={!hasSaveableData} style={{ display: 'inline-flex', alignItems: 'center', gap: Size(6) }}>
               リンク作成
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
             </button>
@@ -1015,9 +1016,9 @@ function App() {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
-            <span style={{ transform: isMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
+            <span style={{ transform: isMenuOpen ? AppUtility.getTextFormat('rotate(45deg) translate({0}, {1})', Size(5), Size(5)) : 'none' }} />
             <span style={{ opacity: isMenuOpen ? 0 : 1 }} />
-            <span style={{ transform: isMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
+            <span style={{ transform: isMenuOpen ? AppUtility.getTextFormat('rotate(-45deg) translate({0}, -{1})', Size(5), Size(5)) : 'none' }} />
           </button>
         </div>
 
@@ -1052,9 +1053,9 @@ function App() {
             className={buttonGroup}
             style={{
               transition: 'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin-top 0.3s ease',
-              maxHeight: viewMode === 'edit' ? '200px' : '0px',
+              maxHeight: viewMode === 'edit' ? Size(200) : Size(0),
               opacity: viewMode === 'edit' ? 1 : 0,
-              marginTop: viewMode === 'edit' ? '10px' : '0px',
+              marginTop: viewMode === 'edit' ? Size(10) : Size(0),
               overflow: 'hidden',
               pointerEvents: viewMode === 'edit' ? 'auto' : 'none',
               width: '100%',
@@ -1063,7 +1064,7 @@ function App() {
             <button className={addButton} onClick={() => { handleAddSet(); setIsMenuOpen(false); }}>
               + セット追加
             </button>
-            <button className={shareButton} onClick={() => { handleShare(); setIsMenuOpen(false); }} disabled={!hasSaveableData} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+            <button className={shareButton} onClick={() => { handleShare(); setIsMenuOpen(false); }} disabled={!hasSaveableData} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: Size(6) }}>
               リンク作成
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
             </button>
@@ -1124,8 +1125,8 @@ function App() {
                 isMobile={isMobile}
               />
             ))}
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
-              <button className={addButton} onClick={handleAddSet} style={{ fontSize: '1.1rem', padding: '14px 32px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: AppUtility.getTextFormat("{0} {1}", Size(20), Size(0)) }}>
+              <button className={addButton} onClick={handleAddSet} style={{ fontSize: Size(18), padding: AppUtility.getTextFormat("{0} {1}", Size(14), Size(32)) }}>
                 + セットを追加
               </button>
             </div>

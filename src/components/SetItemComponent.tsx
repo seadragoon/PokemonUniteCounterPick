@@ -36,7 +36,7 @@ const itemContainer = css`
   align-items: stretch;
   position: relative;
 
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+  @media (max-width: ${Size(MOBILE_BREAKPOINT)}) {
     flex-direction: column;
   }
 `;
@@ -52,7 +52,7 @@ const itemHeader = css`
   width: ${Size(160)};
   flex-shrink: 0;
 
-  @media (max-width: ${MOBILE_BREAKPOINT}px) {
+  @media (max-width: ${Size(MOBILE_BREAKPOINT)}) {
     width: 100%;
     border-right: none;
     border-bottom: ${Size(1)} solid rgba(102, 126, 234, 0.3);

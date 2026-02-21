@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { css } from '@linaria/core';
 import { Size } from '../constants/cssSize';
 import { ModalBase } from './ModalBase';
+import AppUtility from '../utils/appUtility';
 
 interface SetItemEditModalProps {
   isOpen: boolean;
@@ -153,12 +154,12 @@ export function SetItemEditModal({
         </button>
       </div>
 
-      <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '20px 0' }} />
+      <hr style={{ border: 'none', borderTop: AppUtility.getTextFormat("{0} solid #eee", Size(1)), margin: AppUtility.getTextFormat("{0} {1}", Size(20), Size(0)) }} />
 
       {/* Add Section */}
       <div className={section}>
         <label className={label}>項目を追加（この下に追加されます）</label>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: Size(8) }}>
           <input
             type="text"
             className={input}
