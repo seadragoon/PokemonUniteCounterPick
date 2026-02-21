@@ -108,7 +108,7 @@ export default class AppUtility {
       const abort = (): void => {
         reject(new DOMException("aborted", "AbortError"));
       };
-      signal.addEventListener("abort", abort, {once: true});
+      signal.addEventListener("abort", abort, { once: true });
       promise.then(resolve, reject);
     });
   }
@@ -132,7 +132,7 @@ export default class AppUtility {
    * @param replacement 変換文字
    * @returns フォーマット後の文字列
    */
-  public static getTextFormat(template: string, ...replacement: Array<string>): string {
+  public static getFormatText(template: string, ...replacement: Array<string>): string {
     // 配列時は置き換え
     if (typeof replacement[0] === "object") {
       replacement = replacement[0];

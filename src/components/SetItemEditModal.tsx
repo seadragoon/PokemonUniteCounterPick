@@ -154,7 +154,7 @@ export function SetItemEditModal({
         </button>
       </div>
 
-      <hr style={{ border: 'none', borderTop: AppUtility.getTextFormat("{0} solid #eee", Size(1)), margin: AppUtility.getTextFormat("{0} {1}", Size(20), Size(0)) }} />
+      <hr style={{ border: 'none', borderTop: AppUtility.getFormatText("{0} solid #eee", Size(1)), margin: AppUtility.getFormatText("{0} {1}", Size(20), Size(0)) }} />
 
       {/* Add Section */}
       <div className={section}>
