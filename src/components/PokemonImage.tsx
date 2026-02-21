@@ -105,10 +105,11 @@ const imageContainerSelected = css`
 const image = css`
   position: relative;
   z-index: 1; /* 明示的に高くする */
-  width: 95%;
-  height: 95%;
+  width: 92%;
+  height: 92%;
   object-fit: cover;
-  border-radius: ${Size(12)};
+  border-radius: ${Size(10)};
+  background-color: #f0f8ff; /* 薄く白に近い青色 */
 `;
 
 const background = css`
