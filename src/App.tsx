@@ -437,7 +437,7 @@ function App() {
     pokemon: Pokemon;
   } | null>(null);
   // モード管理: 'edit' | 'view'
-  const [viewMode, setViewMode] = useState<'edit' | 'view'>('edit');
+  const [viewMode, setViewMode] = useState<'edit' | 'view'>('view');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRow2Open, setIsRow2Open] = useState(true); // PCヘッダー2段目の開閉
   const [isOverwriteModalOpen, setIsOverwriteModalOpen] = useState(false);
