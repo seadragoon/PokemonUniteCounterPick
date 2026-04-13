@@ -50,6 +50,7 @@ export const samplePokemons: Pokemon[] = [
   { id: 210, name: 'ヤドラン', en_name: 'slowbro', role: Role.Defender, image: '/icons/Slowbro.png' },
   { id: 211, name: 'ヨクバリス', en_name: 'greedent', role: Role.Defender, image: '/icons/Greedent.png' },
   { id: 212, name: 'ラプラス', en_name: 'lapras', role: Role.Defender, image: '/icons/Lapras.png' },
+  { id: 213, name: 'フリーザー', en_name: 'articuno', role: Role.Defender, image: '/icons/Articuno.png' },
   // スピード型 (Speedster) 301〜
   { id: 301, name: 'アブソル', en_name: 'absol', role: Role.Speedster, image: '/icons/Absol.png' },
   { id: 302, name: 'ガラルギャロップ', en_name: 'rapidash', role: Role.Speedster, image: '/icons/Rapidash.png' },
