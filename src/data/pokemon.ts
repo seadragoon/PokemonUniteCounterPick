@@ -37,6 +37,7 @@ export const samplePokemons: Pokemon[] = [
   { id: 121, name: 'インテレオン', en_name: 'inteleon', role: Role.Attacker, image: '/icons/Inteleon.png' },
   { id: 122, name: 'ウッウ', en_name: 'cramorant', role: Role.Attacker, image: '/icons/Cramorant.png' },
   { id: 123, name: 'サンダー', en_name: 'zapdos', role: Role.Attacker, image: '/icons/Zapdos.png' },
+  { id: 124, name: 'バクフーン', en_name: 'typhlosion', role: Role.Attacker, image: '/icons/Typhlosion.png' },
   // ディフェンス型 (Defender) 201〜
   { id: 201, name: 'イワパレス', en_name: 'crustle', role: Role.Defender, image: '/icons/Crustle.png' },
   { id: 202, name: 'オーロット', en_name: 'trevenant', role: Role.Defender, image: '/icons/Trevenant.png' },
