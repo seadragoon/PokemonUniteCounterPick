@@ -97,6 +97,7 @@ export const samplePokemons: Pokemon[] = [
   { id: 429, name: 'メガリザードンY', en_name: 'megaCharizardY', role: Role.AllRounder, image: '/icons/Mega-Charizard-Y.png' },
   { id: 430, name: 'メガギャラドス', en_name: 'megaGyarados', role: Role.AllRounder, image: '/icons/Mega-Gyarados.png' },
   { id: 431, name: 'ファイヤー', en_name: 'moltres', role: Role.AllRounder, image: '/icons/Moltres.png' },
+  { id: 432, name: 'オーダイル', en_name: 'feraligatr', role: Role.AllRounder, image: '/icons/Feraligatr.png' },
   // サポート型 (Support) 501〜
   { id: 501, name: 'キュワワー', en_name: 'comfey', role: Role.Support, image: '/icons/Comfey.png' },
   { id: 502, name: 'コダック', en_name: 'psyduck', role: Role.Support, image: '/icons/Psyduck.png' },
@@ -109,4 +110,5 @@ export const samplePokemons: Pokemon[] = [
   { id: 509, name: 'ヤミラミ', en_name: 'sableye', role: Role.Support, image: '/icons/Sableye.png' },
   { id: 510, name: 'ラティアス', en_name: 'latias', role: Role.Support, image: '/icons/Latias.png' },
   { id: 511, name: 'ワタシラガ', en_name: 'eldegoss', role: Role.Support, image: '/icons/Eldegoss.png' },
+  { id: 512, name: 'メガニウム', en_name: 'meganium', role: Role.Support, image: '/icons/Meganium.png' },
 ];
