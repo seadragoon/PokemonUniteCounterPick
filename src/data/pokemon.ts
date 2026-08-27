@@ -38,6 +38,9 @@ export const samplePokemons: Pokemon[] = [
   { id: 122, name: 'ウッウ', en_name: 'cramorant', role: Role.Attacker, image: '/icons/Cramorant.png' },
   { id: 123, name: 'サンダー', en_name: 'zapdos', role: Role.Attacker, image: '/icons/Zapdos.png' },
   { id: 124, name: 'バクフーン', en_name: 'typhlosion', role: Role.Attacker, image: '/icons/Typhlosion.png' },
+  { id: 125, name: 'イベルタル', en_name: 'yveltal', role: Role.Attacker, image: '/icons/Yveltal.png' },
+  { id: 126, name: 'レシラム', en_name: 'reshiram', role: Role.Attacker, image: '/icons/Reshiram.png' },
+  { id: 127, name: 'ラウドボーン', en_name: 'skeledirge', role: Role.Attacker, image: '/icons/Skeledirge.png' },
   // ディフェンス型 (Defender) 201〜
   { id: 201, name: 'イワパレス', en_name: 'crustle', role: Role.Defender, image: '/icons/Crustle.png' },
   { id: 202, name: 'オーロット', en_name: 'trevenant', role: Role.Defender, image: '/icons/Trevenant.png' },
@@ -98,6 +101,9 @@ export const samplePokemons: Pokemon[] = [
   { id: 430, name: 'メガギャラドス', en_name: 'megaGyarados', role: Role.AllRounder, image: '/icons/Mega-Gyarados.png' },
   { id: 431, name: 'ファイヤー', en_name: 'moltres', role: Role.AllRounder, image: '/icons/Moltres.png' },
   { id: 432, name: 'オーダイル', en_name: 'feraligatr', role: Role.AllRounder, image: '/icons/Feraligatr.png' },
+  { id: 433, name: 'パルキア', en_name: 'palkia', role: Role.AllRounder, image: '/icons/Palkia.png' },
+  { id: 434, name: 'ソルガレオ', en_name: 'solgaleo', role: Role.AllRounder, image: '/icons/Solgaleo.png' },
+  { id: 435, name: 'ウェーニバル', en_name: 'quaquaval', role: Role.AllRounder, image: '/icons/Quaquaval.png' },
   // サポート型 (Support) 501〜
   { id: 501, name: 'キュワワー', en_name: 'comfey', role: Role.Support, image: '/icons/Comfey.png' },
   { id: 502, name: 'コダック', en_name: 'psyduck', role: Role.Support, image: '/icons/Psyduck.png' },
