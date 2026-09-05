@@ -68,6 +68,7 @@ export const samplePokemons: Pokemon[] = [
   { id: 310, name: 'マスカーニャ', en_name: 'meowscara', role: Role.Speedster, image: '/icons/Meowscarada.png' },
   { id: 311, name: 'リーフィア', en_name: 'leafeon', role: Role.Speedster, image: '/icons/Leafeon.png' },
   { id: 312, name: 'ストライク', en_name: 'scyther', role: Role.Speedster, image: '/icons/Scyther.png' },
+  { id: 313, name: 'モルペコ', en_name: 'morpeko', role: Role.Speedster, image: '/icons/Morpeko.png' },
   // バランス型 (AllRounder) 401〜
   { id: 401, name: 'アマージョ', en_name: 'tsareena', role: Role.AllRounder, image: '/icons/Tsareena.png' },
   { id: 402, name: 'ウーラオス', en_name: 'urshifu_Single', role: Role.AllRounder, image: '/icons/Urshifu.png' },
