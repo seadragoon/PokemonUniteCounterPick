@@ -41,6 +41,7 @@ export const samplePokemons: Pokemon[] = [
   { id: 125, name: 'イベルタル', en_name: 'yveltal', role: Role.Attacker, image: '/icons/Yveltal.png' },
   { id: 126, name: 'レシラム', en_name: 'reshiram', role: Role.Attacker, image: '/icons/Reshiram.png' },
   { id: 127, name: 'ラウドボーン', en_name: 'skeledirge', role: Role.Attacker, image: '/icons/Skeledirge.png' },
+  { id: 128, name: 'ストリンダー', en_name: 'toxtricity', role: Role.Attacker, image: '/icons/Toxtricity.png' },
   // ディフェンス型 (Defender) 201〜
   { id: 201, name: 'イワパレス', en_name: 'crustle', role: Role.Defender, image: '/icons/Crustle.png' },
   { id: 202, name: 'オーロット', en_name: 'trevenant', role: Role.Defender, image: '/icons/Trevenant.png' },
@@ -69,6 +70,7 @@ export const samplePokemons: Pokemon[] = [
   { id: 311, name: 'リーフィア', en_name: 'leafeon', role: Role.Speedster, image: '/icons/Leafeon.png' },
   { id: 312, name: 'ストライク', en_name: 'scyther', role: Role.Speedster, image: '/icons/Scyther.png' },
   { id: 313, name: 'モルペコ', en_name: 'morpeko', role: Role.Speedster, image: '/icons/Morpeko.png' },
+  { id: 314, name: 'サンダース', en_name: 'jolteon', role: Role.Speedster, image: '/icons/Jolteon.png' },
   // バランス型 (AllRounder) 401〜
   { id: 401, name: 'アマージョ', en_name: 'tsareena', role: Role.AllRounder, image: '/icons/Tsareena.png' },
   { id: 402, name: 'ウーラオス', en_name: 'urshifu_Single', role: Role.AllRounder, image: '/icons/Urshifu.png' },
@@ -105,6 +107,7 @@ export const samplePokemons: Pokemon[] = [
   { id: 433, name: 'パルキア', en_name: 'palkia', role: Role.AllRounder, image: '/icons/Palkia.png' },
   { id: 434, name: 'ソルガレオ', en_name: 'solgaleo', role: Role.AllRounder, image: '/icons/Solgaleo.png' },
   { id: 435, name: 'ウェーニバル', en_name: 'quaquaval', role: Role.AllRounder, image: '/icons/Quaquaval.png' },
+  { id: 436, name: 'ブースター', en_name: 'flareon', role: Role.AllRounder, image: '/icons/Flareon.png' },
   // サポート型 (Support) 501〜
   { id: 501, name: 'キュワワー', en_name: 'comfey', role: Role.Support, image: '/icons/Comfey.png' },
   { id: 502, name: 'コダック', en_name: 'psyduck', role: Role.Support, image: '/icons/Psyduck.png' },
