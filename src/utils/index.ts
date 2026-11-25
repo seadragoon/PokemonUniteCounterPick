@@ -13,7 +13,7 @@ export default class utils {
    * @param obj 任意のオブジェクト
    * @returns 真偽値
    */
-  public static isObject(obj: any): obj is object {
+  public static isObject(obj: unknown): obj is object {
     return typeof (obj) === "object";
   }
 
@@ -22,7 +22,7 @@ export default class utils {
    * @param obj 任意のオブジェクト
    * @returns 真偽値
    */
-  public static isFunction(obj: any): obj is Function {
+  public static isFunction(obj: unknown): obj is (...args: unknown[]) => unknown {
     return typeof (obj) === "function";
   }
 
@@ -31,7 +31,7 @@ export default class utils {
    * @param obj 任意のオブジェクト
    * @returns 真偽値
    */
-  public static isString(obj: any): obj is string {
+  public static isString(obj: unknown): obj is string {
     return typeof (obj) === "string";
   }
 
@@ -40,7 +40,7 @@ export default class utils {
    * @param obj 任意のオブジェクト
    * @returns 真偽値
    */
-  public static isNumber(obj: any): obj is number {
+  public static isNumber(obj: unknown): obj is number {
     return typeof (obj) === "number";
   }
 
@@ -49,7 +49,7 @@ export default class utils {
    * @param obj 任意のオブジェクト
    * @returns 真偽値
    */
-  public static isStringArray(obj: any): obj is Array<string> {
+  public static isStringArray(obj: unknown): obj is Array<string> {
     return Array.isArray(obj) && (obj as Array<string>).every((x) => typeof (x) === "string");
   }
 

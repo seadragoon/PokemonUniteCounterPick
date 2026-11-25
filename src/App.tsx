@@ -818,17 +818,17 @@ function App() {
       }
       return prevSets;
     });
-  }, []);
+  }, [setSets]);
 
   const handleSetDelete = useCallback((setId: string) => {
     if (window.confirm('このセットを削除しますか？')) {
       setSets((prevSets) => prevSets.filter((s) => s.id !== setId));
     }
-  }, []);
+  }, [setSets]);
 
   const handleSetUpdate = useCallback((setId: string, updatedSet: RuntimeSet) => {
     setSets((prevSets) => prevSets.map((s) => (s.id === setId ? updatedSet : s)));
-  }, []);
+  }, [setSets]);
 
 
 
@@ -898,7 +898,7 @@ function App() {
 
       return null;
     });
-  }, []);
+  }, [setSets]);
 
   const handlePoolClick = useCallback((setId: string) => {
     setSelectedPokemon((prevSelectedPokemon) => {
@@ -944,7 +944,7 @@ function App() {
 
       return null; // 選択解除
     });
-  }, []);
+  }, [setSets]);
 
   const handlePokemonClick = useCallback((setId: string, pokemon: Pokemon) => {
     // 既にポケモン選択中で、別のポケモンをクリックした場合

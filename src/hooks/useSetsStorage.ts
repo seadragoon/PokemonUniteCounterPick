@@ -52,23 +52,36 @@ const computePool = (items: { pokemons: Pokemon[] }[]): Pokemon[] => {
     return samplePokemons.filter((p) => !usedIds.has(p.id));
 };
 
+interface RawSetItem {
+    n?: string;
+    name?: string;
+    p?: unknown[];
+    pokemons?: unknown[];
+}
+
+interface RawSet {
+    n?: string;
+    name?: string;
+    i?: RawSetItem[];
+    items?: RawSetItem[];
+}
+
 /**
  * localStorage / URL からセットデータを読み込み、RuntimeSetに変換する。
  * 短縮キー（n, i, p）と旧形式の長いキー（name, items, pokemons）の両方に対応。
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const deserializeSets = (parsed: any[]): RuntimeSet[] => {
-    return parsed.map((set: any, si: number) => {
+const deserializeSets = (parsed: RawSet[]): RuntimeSet[] => {
+    return parsed.map((set, si) => {
         const setId = `s${si}`;
         const rawItems = set.i || set.items || [];
-        const items = rawItems.map((item: any, ii: number) => ({
+        const items = rawItems.map((item, ii) => ({
             id: `${setId}_i${ii}`,
             name: item.n || item.name || DEFAULT_ITEM_NAMES[ii] || '',
             pokemons: (item.p || item.pokemons || [])
-                .map((p: any) => resolvePokemonId(p))
-                .filter((id: number | null): id is number => id !== null)
-                .map((id: number) => pokemonById(id))
-                .filter(Boolean),
+                .map((p) => resolvePokemonId(p))
+                .filter((id): id is number => id !== null)
+                .map((id) => pokemonById(id))
+                .filter((p): p is Pokemon => p !== undefined),
         }));
         return {
             id: setId,

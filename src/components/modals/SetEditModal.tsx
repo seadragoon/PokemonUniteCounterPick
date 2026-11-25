@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { css } from '@linaria/core';
 import { Size } from '../../constants/cssSize';
 import { ModalBase } from './ModalBase';
@@ -49,13 +49,15 @@ export function SetEditModal({
     onRename,
 }: SetEditModalProps) {
     const [tempName, setTempName] = useState(setName);
+    const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
 
     // Reset state when modal opens
-    useEffect(() => {
+    if (isOpen !== prevIsOpen) {
+        setPrevIsOpen(isOpen);
         if (isOpen) {
             setTempName(setName);
         }
-    }, [isOpen, setName]);
+    }
 
     // Handle closing - save rename changes
     const handleClose = () => {
