@@ -51,6 +51,7 @@
 - **Drag & Drop**: @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities
 - **Icons**: React Icons (lucide-react等)
 - **Hosting**: GitHub Pages (GitHub ActionsによるCI/CDデプロイ)
+- **Development**: Google Antigravity（AI コーディングエージェントを活用して実装）
 
 ## 💻 開発・セットアップ
 
