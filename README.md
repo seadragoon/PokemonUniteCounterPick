@@ -5,7 +5,6 @@
 
 ## 🌐 サイトのURL（GitHub Pages）
 **[こちらのリンクからアプリを利用できます](https://seadragoon.github.io/PokemonUniteCounterPick/)**
-*(ご自身のリポジトリURLに置き換えてください)*
 
 ---
 
